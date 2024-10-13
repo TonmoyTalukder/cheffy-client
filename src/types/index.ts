@@ -48,6 +48,7 @@ export interface IUser {
   foodHabit: string;
   sex: string;
   topics?: Array<string>;
+  isPremium?: boolean;
   createdAt?: string;
   updatedAt?: string;
   __v?: number;

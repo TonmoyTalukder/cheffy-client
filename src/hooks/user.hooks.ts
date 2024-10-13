@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { FieldValues } from "react-hook-form";
 
-import { followUser, getSingleUser, updateUser } from "../services/UserService";
+import { followUser, getSingleUser, patronSuggestion, updateUser } from "../services/UserService";
 
 // Fetch single user
 export const useGetSingleUser = (id: string) => {
@@ -48,12 +48,12 @@ export const useUpdateUser = (id: string) => {
 };
 
 // Follow user
-export const useFollowUser = (id: string, targetId: string) => {
+export const useFollowUser = (id: string) => {
   return useMutation({
-    mutationKey: ["FOLLOW_USER", id, targetId],
-    mutationFn: async () => {
+    mutationKey: ["FOLLOW_USER", id],
+    mutationFn: async (targetId: string) => { // Accept targetId as a parameter
       console.log(`Following user Id: ${id}`);
-      console.log(`targetId: ${targetId}`);
+      console.log(`Target Id: ${targetId}`);
       const response = await followUser(id, targetId);
 
       console.log("Response from server:", response);
@@ -65,7 +65,26 @@ export const useFollowUser = (id: string, targetId: string) => {
     },
     onError: (error: { message: any }) => {
       toast.error(error.message);
-      console.log("error hook => ", error);
+      console.log("Error hook =>", error);
     },
+  });
+};
+
+// Patron suggestion
+export const usePatronSuggestion = (id: string) => {
+  return useQuery({
+    queryKey: ["PATRON_SUGGESTION", id],
+    queryFn: async () => {
+      try {
+        const data = await patronSuggestion(id);
+        console.log("Patron data from hooks =>", data);
+        return data; // Ensure data is returned
+      } catch (error: any) {
+        console.error("Error fetching patron suggestions:", error); // Log the error
+        toast.error("Error fetching patron suggestions:", error); 
+        throw error; // Rethrow error for react-query to handle
+      }
+    },
+    enabled: !!id, // Only run if id is defined
   });
 };

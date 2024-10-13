@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Badge, Button } from "@nextui-org/react";
 import Image from "next/image";
 import {
   FaPhone,
@@ -14,6 +14,8 @@ import {
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import { PiSealCheckFill } from "react-icons/pi";
+import Link from "next/link";
 
 import { IUser, TFollowUser } from "@/src/types";
 import {
@@ -22,7 +24,6 @@ import {
   useUpdateUser,
 } from "@/src/hooks/user.hooks";
 import EditProfileModal from "@/src/components/modal/EditProfileModal";
-import Link from "next/link";
 
 interface IProps {
   params: {
@@ -113,6 +114,17 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     });
   };
 
+  const handleUpdatePremiumUser = (updatedData: any) => {
+    setUser((prevUser) => ({ ...prevUser, ...updatedData }));
+    console.log("Updated Data => ", updatedData);
+    handleUpdateUserApi(updatedData, {
+      onSuccess: () => {
+        // Re-fetch user data after successful update
+        refetch();
+      },
+    });
+  };
+
   // Display notifications and handle loading state
   useEffect(() => {
     if (updatePending) {
@@ -129,8 +141,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
   const { mutate: handleFollowUser, isPending: followLoading } = useFollowUser(
     visitorUser?._id!,
-    profileId,
+    // profileId,
   );
+
+  const handleFollowUnfollow = (targetUserId: string) => {
+    if (!visitorUser?._id) return;
+  
+    handleFollowUser(targetUserId);
+  };
 
   if (isLoading) return <div className="text-center">Loading...</div>;
   if (error) {
@@ -170,7 +188,31 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               src={user.displayPicture}
             />
             <div className="ml-4 mt-2">
-              <h1 className="text-3xl font-semibold">{user.name}</h1>
+              <div className="flex">
+                <h1 className="text-3xl font-semibold">{user.name}</h1>{" "}
+                {isOwner && (
+                  <>
+                    {user.isPremium && <PiSealCheckFill />}
+                    {!user.isPremium && (
+                      <Button
+                        className="ml-2"
+                        size="md"
+                        onClick={() => {
+                          handleUpdatePremiumUser({
+                            _id: user._id,
+                            isPremium: true,
+                          });
+                          setTimeout(() => {
+                            window.location.reload(); // Reload the window
+                          }, 1000);
+                        }}
+                      >
+                        Be Premium User <PiSealCheckFill />
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
               <div className="flex items-center space-x-2 mt-2">
                 <span className="text-gray-500 font-medium">
                   {user.followers!.length} Followers
@@ -195,7 +237,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   className="bg-gray-400"
                   size="md"
                   onClick={() => {
-                    handleFollowUser();
+                    handleFollowUser(profileId);
                     setTimeout(() => {
                       window.location.reload(); // Reload the window
                     }, 500);
@@ -209,7 +251,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   disabled={followLoading}
                   size="md"
                   onClick={() => {
-                    handleFollowUser();
+                    handleFollowUser(profileId);
                     setTimeout(() => {
                       window.location.reload(); // Reload the window
                     }, 500);
@@ -311,7 +353,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               {user.followers?.length === 0 ? (
                 <p className="text-gray-500 mt-2">No followers yet.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full mb-3">
                   {user.followers?.map((follower, index) => (
                     <div
                       key={index}
@@ -340,7 +382,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             className="bg-gray-400"
                             size="md"
                             onClick={() => {
-                              handleFollowUser();
+                              handleFollowUnfollow(follower.id);
                               setTimeout(() => {
                                 window.location.reload(); // Reload the window
                               }, 500);
@@ -354,7 +396,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             disabled={followLoading}
                             size="md"
                             onClick={() => {
-                              handleFollowUser();
+                              handleFollowUnfollow(follower.id);
                               setTimeout(() => {
                                 window.location.reload(); // Reload the window
                               }, 500);
@@ -377,7 +419,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               {user.following?.length === 0 ? (
                 <p className="text-gray-500 mt-2">Not following anyone yet.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full mb-3">
                   {user.following?.map((follow, index) => (
                     <div
                       key={index}
@@ -406,7 +448,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             className="bg-gray-400"
                             size="md"
                             onClick={() => {
-                              handleFollowUser();
+                              handleFollowUnfollow(follow.id);
                               setTimeout(() => {
                                 window.location.reload(); // Reload the window
                               }, 500);
@@ -420,7 +462,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             disabled={followLoading}
                             size="md"
                             onClick={() => {
-                              handleFollowUser();
+                              handleFollowUnfollow(follow.id);
                               setTimeout(() => {
                                 window.location.reload(); // Reload the window
                               }, 500);
