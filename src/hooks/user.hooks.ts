@@ -3,7 +3,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { FieldValues } from "react-hook-form";
 
-import { followUser, getSingleUser, patronSuggestion, updateUser } from "../services/UserService";
+import {
+  followUser,
+  getSingleUser,
+  patronSuggestion,
+  premiumPayment,
+  updateUser,
+} from "../services/UserService";
 
 // Fetch single user
 export const useGetSingleUser = (id: string) => {
@@ -51,7 +57,8 @@ export const useUpdateUser = (id: string) => {
 export const useFollowUser = (id: string) => {
   return useMutation({
     mutationKey: ["FOLLOW_USER", id],
-    mutationFn: async (targetId: string) => { // Accept targetId as a parameter
+    mutationFn: async (targetId: string) => {
+      // Accept targetId as a parameter
       console.log(`Following user Id: ${id}`);
       console.log(`Target Id: ${targetId}`);
       const response = await followUser(id, targetId);
@@ -77,14 +84,38 @@ export const usePatronSuggestion = (id: string) => {
     queryFn: async () => {
       try {
         const data = await patronSuggestion(id);
+
         console.log("Patron data from hooks =>", data);
+
         return data; // Ensure data is returned
       } catch (error: any) {
         console.error("Error fetching patron suggestions:", error); // Log the error
-        toast.error("Error fetching patron suggestions:", error); 
+        toast.error("Error fetching patron suggestions:", error);
         throw error; // Rethrow error for react-query to handle
       }
     },
     enabled: !!id, // Only run if id is defined
+  });
+};
+
+// Premium payment hook
+export const usePremiumPayment = (id: string) => {
+  return useMutation({
+    mutationKey: ["PREMIUM_PAYMENT", id], // Unique key for this mutation
+    mutationFn: async () => {
+      console.log(`Initiating premium payment for user Id: ${id}`); // Log the initiation
+      const response = await premiumPayment(id); // Call the service to initiate payment
+
+      console.log("Premium payment response from server:", response); // Log the server response
+
+      return response; // Return the response data
+    },
+    onSuccess: () => {
+      toast.success("Premium payment initiated successfully."); // Show success notification
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to initiate premium payment: ${error.message}`); // Show error notification
+      console.error("Error initiating premium payment =>", error); // Log the error
+    },
   });
 };

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Avatar, Button, ScrollShadow } from "@nextui-org/react";
+import Link from "next/link";
+
 import { usePatronSuggestion, useFollowUser } from "@/src/hooks/user.hooks";
 import { useUser } from "@/src/context/user.provider";
 import { IUser, TFollowUser } from "@/src/types";
-import { Avatar, Button, ScrollShadow } from "@nextui-org/react";
-import Link from "next/link";
 
 export default function FollowPage() {
   const { user: currentUser, setIsLoading: userLoading } = useUser();
@@ -33,11 +34,14 @@ export default function FollowPage() {
           const isFollowing = currentUser?.following?.some(
             (f: TFollowUser) => f.id === user._id,
           );
+
           acc[user._id] = !!isFollowing;
+
           return acc;
         },
         {},
       );
+
       setFollowing(initialFollowingState);
     }
   }, [data, currentUser]);
@@ -91,8 +95,8 @@ export default function FollowPage() {
                   {following[user._id] ? (
                     <Button
                       className="bg-gray-400"
-                      size="md"
                       disabled={followLoading}
+                      size="md"
                       onClick={() => handleFollowUnfollow(user._id)}
                     >
                       {followLoading ? "Unfollowing..." : "Unfollow"}
@@ -100,8 +104,8 @@ export default function FollowPage() {
                   ) : (
                     <Button
                       color="primary"
-                      size="md"
                       disabled={followLoading}
+                      size="md"
                       onClick={() => handleFollowUnfollow(user._id)}
                     >
                       {followLoading ? "Following..." : "Follow"}

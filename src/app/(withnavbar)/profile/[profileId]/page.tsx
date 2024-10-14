@@ -21,9 +21,12 @@ import { IUser, TFollowUser } from "@/src/types";
 import {
   useFollowUser,
   useGetSingleUser,
+  usePremiumPayment,
   useUpdateUser,
 } from "@/src/hooks/user.hooks";
 import EditProfileModal from "@/src/components/modal/EditProfileModal";
+import axios from "axios";
+import envConfig from "@/src/config/envConfig";
 
 interface IProps {
   params: {
@@ -33,6 +36,8 @@ interface IProps {
 
 const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const { data, isLoading, error, refetch } = useGetSingleUser(profileId);
+  const { mutate: initiatePayment, isPending: premiumPayPending } =
+    usePremiumPayment(profileId);
 
   // State
   const [user, setUser] = useState<IUser | null>(null);
@@ -114,7 +119,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     });
   };
 
-  const handleUpdatePremiumUser = (updatedData: any) => {
+  const handleUpdatePremiumUser = async (updatedData: any) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
     console.log("Updated Data => ", updatedData);
     handleUpdateUserApi(updatedData, {
@@ -123,6 +128,20 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
         refetch();
       },
     });
+
+    // const res = initiatePayment();
+    const response = await axios.post(
+      `${envConfig.baseApi}/payment/initiate-payment/${profileId}`,
+    );
+
+    const paymentUrl = response.data?.paymentSession?.payment_url;
+
+    console.log("Payment res: ", response.data.paymentSession.payment_url);
+
+    if (paymentUrl) {
+      // Redirect user to the payment URL
+      window.open(paymentUrl);
+    }
   };
 
   // Display notifications and handle loading state
@@ -146,7 +165,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
   const handleFollowUnfollow = (targetUserId: string) => {
     if (!visitorUser?._id) return;
-  
+
     handleFollowUser(targetUserId);
   };
 
@@ -202,12 +221,18 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             _id: user._id,
                             isPremium: true,
                           });
-                          setTimeout(() => {
-                            window.location.reload(); // Reload the window
-                          }, 1000);
+                          // setTimeout(() => {
+                          //   window.location.reload(); // Reload the window
+                          // }, 1000);
                         }}
                       >
-                        Be Premium User <PiSealCheckFill />
+                        {premiumPayPending ? (
+                          "Processing..."
+                        ) : (
+                          <p className="flex">
+                            Be Premium User &nbsp; <PiSealCheckFill />
+                          </p>
+                        )}
                       </Button>
                     )}
                   </>
