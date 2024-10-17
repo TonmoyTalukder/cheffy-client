@@ -1,17 +1,16 @@
+import envConfig from "../config/envConfig";
+
 export const uploadImageFile = async (file: File): Promise<string | null> => {
   try {
     const imgData = new FormData();
 
     imgData.append("photo", file);
 
-    const response = await fetch(
-      `https://cheffy-server.vercel.app/api/image-upload/`,
-      {
-        method: "POST",
-        body: imgData,
-        credentials: "include",
-      },
-    );
+    const response = await fetch(`${envConfig.baseApi}/image-upload/`, {
+      method: "POST",
+      body: imgData,
+      credentials: "include",
+    });
 
     if (!response.ok) {
       const errorData = await response.text();

@@ -1,12 +1,11 @@
 import "@/src/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@nextui-org/link";
 import clsx from "clsx";
-
-import { Providers } from "../lib/Providers";
 
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
+
+import { Providers } from "../lib/Providers";
 
 export const metadata: Metadata = {
   title: {
@@ -43,7 +42,7 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           {children}
 
-          <footer className="w-full flex items-center justify-center py-3">
+          {/* <footer className="w-full flex items-center justify-center py-3 border-1 relative">
             <span className="text-default-600">
               Cheffy ©{new Date().getFullYear()} | Developed by &nbsp;
             </span>
@@ -56,7 +55,7 @@ export default function RootLayout({
             >
               <p>Tonmoy Talukder</p>
             </Link>
-          </footer>
+          </footer> */}
         </Providers>
       </body>
     </html>

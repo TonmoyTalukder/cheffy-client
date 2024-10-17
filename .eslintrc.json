@@ -9,7 +9,9 @@
     "plugin:react/recommended",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:jsx-a11y/recommended"
+    "plugin:jsx-a11y/recommended",
+    "next",
+    "next/core-web-vitals"
   ],
   "plugins": [
     "react",
@@ -36,6 +38,7 @@
     "no-console": "warn",
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
+    "react/jsx-sort-props": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/exhaustive-deps": "off",
     "jsx-a11y/click-events-have-key-events": "warn",
@@ -76,15 +79,15 @@
       }
     ],
     "react/self-closing-comp": "warn",
-    "react/jsx-sort-props": [
-      "warn",
-      {
-        "callbacksLast": true,
-        "shorthandFirst": true,
-        "noSortAlphabetically": false,
-        "reservedFirst": true
-      }
-    ],
+    // "react/jsx-sort-props": [
+    //   "warn",
+    //   {
+    //     "callbacksLast": true,
+    //     "shorthandFirst": true,
+    //     "noSortAlphabetically": false,
+    //     "reservedFirst": true
+    //   }
+    // ],
     "padding-line-between-statements": [
       "warn",
       { "blankLine": "always", "prev": "*", "next": "return" },

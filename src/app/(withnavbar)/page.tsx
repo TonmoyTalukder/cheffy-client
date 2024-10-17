@@ -9,7 +9,12 @@ export default function Home() {
   console.log("isLoading => ", isLoading);
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <section
+      style={{
+        margin: "5%",
+      }}
+      className="flex flex-col items-center justify-center gap-4 py-8 md:py-10"
+    >
       <div className="inline-block max-w-xl text-center justify-center">
         <span className={title()}>Hello&nbsp;</span>
         <span className={title({ color: "violet" })}>Cheffy!</span>

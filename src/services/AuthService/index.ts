@@ -67,6 +67,7 @@ export const getCurrentUser = async () => {
       foodHabit: decodedToken.foodHabit,
       sex: decodedToken.sex,
       topics: decodedToken.topics,
+      isPremium: decodedToken.isPremium,
     };
 
     return userData;

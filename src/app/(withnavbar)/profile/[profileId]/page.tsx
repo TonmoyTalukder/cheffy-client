@@ -2,7 +2,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, Badge, Button } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
 import Image from "next/image";
 import {
   FaPhone,
@@ -16,6 +25,8 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 import { PiSealCheckFill } from "react-icons/pi";
 import Link from "next/link";
+import axios from "axios";
+import { FaEdit } from "react-icons/fa";
 
 import { IUser, TFollowUser } from "@/src/types";
 import {
@@ -25,8 +36,9 @@ import {
   useUpdateUser,
 } from "@/src/hooks/user.hooks";
 import EditProfileModal from "@/src/components/modal/EditProfileModal";
-import axios from "axios";
 import envConfig from "@/src/config/envConfig";
+import RecipePostForm from "@/src/components/post/RecipePostForm";
+import UserRecipePost from "@/src/components/post/UserRecipePost";
 
 interface IProps {
   params: {
@@ -36,8 +48,11 @@ interface IProps {
 
 const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const { data, isLoading, error, refetch } = useGetSingleUser(profileId);
-  const { mutate: initiatePayment, isPending: premiumPayPending } =
-    usePremiumPayment(profileId);
+  const {
+    // mutate: initiatePayment,
+    isPending: premiumPayPending,
+  } = usePremiumPayment(profileId);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // State
   const [user, setUser] = useState<IUser | null>(null);
@@ -64,7 +79,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     if (accessToken) {
       const touristUser = jwtDecode<IUser>(accessToken);
 
-      setTouristId(touristUser._id); // Set tourist ID for useGetSingleUser to trigger
+      if (touristUser !== null) {
+        setTouristId(touristUser._id!); // Set tourist ID for useGetSingleUser to trigger
+      }
     }
   }, []);
 
@@ -182,8 +199,10 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     user.coverPicture ||
     "https://www.bayarea.com/wp-content/uploads/2017/07/CookingClass_main.jpg"; // Fallback cover image
 
+  console.log("User => ", user);
+
   return (
-    <div className="w-full lg:w-9/12 xl:w-9/12 mx-auto mt-0">
+    <div className="w-full lg:w-9/12 xl:w-9/12 mx-auto mt-14">
       {/* Cover Photo */}
       <div className="relative w-full h-60 rounded-lg">
         <Image
@@ -209,9 +228,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             <div className="ml-4 mt-2">
               <div className="flex">
                 <h1 className="text-3xl font-semibold">{user.name}</h1>{" "}
+                {user.isPremium && <PiSealCheckFill />}
                 {isOwner && (
                   <>
-                    {user.isPremium && <PiSealCheckFill />}
                     {!user.isPremium && (
                       <Button
                         className="ml-2"
@@ -299,6 +318,23 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
         </div>
       </div>
 
+      {/* Intro Section */}
+      <div className="block md:hidden lg:hidden xl:hidden p-6 rounded-lg shadow-lg sm:w-full max-h-fit">
+        <h3 className="text-xl font-semibold">Intro</h3>
+        <p className="text-gray-500 mt-2">{user.bio}</p>
+        <div className="mt-4 text-left">
+          <p>
+            <strong>City:</strong> {user.city}
+          </p>
+          <p>
+            <strong>Food Habit:</strong> {user.foodHabit}
+          </p>
+          <p>
+            <strong>Topics:</strong> {user.topics?.join(", ")}
+          </p>
+        </div>
+      </div>
+
       {/* Edit Profile Modal */}
       <EditProfileModal
         isOpen={isModalOpen}
@@ -345,30 +381,75 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Intro Section */}
-        <div className="p-6 rounded-lg shadow-lg w-full lg:w-1/3">
-          <h3 className="text-xl font-semibold">Intro</h3>
-          <p className="text-gray-500 mt-2">{user.bio}</p>
-          <div className="mt-4 text-left">
-            <p>
-              <strong>City:</strong> {user.city}
-            </p>
-            <p>
-              <strong>Food Habit:</strong> {user.foodHabit}
-            </p>
-            <p>
-              <strong>Topics:</strong> {user.topics?.join(", ")}
-            </p>
-          </div>
-        </div>
-
-        {/* Right Column for Posts/Follower/Photos */}
-        <div className="w-full lg:w-2/3">
+      <div>
+        {/* Right Column for Posts and others */}
+        <div>
           {activeTab === "posts" && (
-            <div className="p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold">Posts</h3>
-              <p className="text-gray-500 mt-2">No posts yet.</p>
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Intro Section */}
+              <div className="hidden md:block lg:block xl:block p-6 rounded-lg shadow-lg w-1/3  max-h-fit">
+                <h3 className="text-xl font-semibold">Intro</h3>
+                <p className="text-gray-500 mt-2">{user.bio}</p>
+                <div className="mt-4 text-left">
+                  <p>
+                    <strong>City:</strong> {user.city}
+                  </p>
+                  <p>
+                    <strong>Food Habit:</strong> {user.foodHabit}
+                  </p>
+                  <p>
+                    <strong>Topics:</strong> {user.topics?.join(", ")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="w-full lg:w-2/3 min-h-min flex flex-col items-center">
+                <div className="min-h-min mx-auto flex flex-col items-center justify-center w-full">
+                  {/* <Button onPress={onOpen}>Open Modal</Button> */}
+                  {isOwner && (
+                    <Button
+                      className="flex items-center w-[70%] px-4 py-2 mt-5 border border-gray-500 rounded-md shadow-sm text-gray-500 hover:text-gray-200 hover:bg-gray-500 text-left"
+                      style={{ textAlign: "left" }}
+                      onPress={onOpen}
+                    >
+                      <FaEdit className="mr-2 text-gray-400" />
+                      Write a new recipe...
+                    </Button>
+                  )}
+                  <Modal
+                    backdrop={"blur"}
+                    isOpen={isOpen}
+                    scrollBehavior={"outside"}
+                    onOpenChange={onOpenChange}
+                  >
+                    <ModalContent>
+                      {(onClose) => (
+                        <>
+                          <ModalHeader className="flex flex-col gap-1">
+                            <span>{user.name}, write a new recipe.</span>
+                          </ModalHeader>
+                          <ModalBody>
+                            <RecipePostForm />
+                          </ModalBody>
+                          <ModalFooter className="flex justify-center items-center w-full">
+                            <Button
+                              color="danger"
+                              variant="light"
+                              onPress={onClose}
+                            >
+                              Close
+                            </Button>
+                          </ModalFooter>
+                        </>
+                      )}
+                    </ModalContent>
+                  </Modal>
+                  <div className="flex flex-col items-center justify-center w-full p-6 rounded-lg shadow-lg">
+                    {/* <h3 className="text-xl font-semibold">Posts</h3> */}
+                    <UserRecipePost profileId={profileId} />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

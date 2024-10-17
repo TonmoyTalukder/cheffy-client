@@ -9,7 +9,7 @@ import { useUser } from "@/src/context/user.provider";
 import { IUser, TFollowUser } from "@/src/types";
 
 export default function FollowPage() {
-  const { user: currentUser, setIsLoading: userLoading } = useUser();
+  const { user: currentUser } = useUser();
   const profileId = currentUser?._id;
   const { data, isLoading, error, refetch } = usePatronSuggestion(profileId!);
 
@@ -31,11 +31,14 @@ export default function FollowPage() {
       // Set initial follow state for all suggested users
       const initialFollowingState = data.data.reduce(
         (acc: { [key: string]: boolean }, user: IUser) => {
-          const isFollowing = currentUser?.following?.some(
-            (f: TFollowUser) => f.id === user._id,
-          );
+          if (user._id) {
+            // Check if user._id exists
+            const isFollowing = currentUser?.following?.some(
+              (f: TFollowUser) => f.id === user._id,
+            );
 
-          acc[user._id] = !!isFollowing;
+            acc[user._id] = !!isFollowing; // Set following state
+          }
 
           return acc;
         },
@@ -70,7 +73,7 @@ export default function FollowPage() {
           {data && data.data.length > 0 ? (
             data.data.map((user: IUser) => (
               <div
-                key={user._id}
+                key={user._id} // Assuming user._id exists for all
                 className="flex items-center justify-between p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 w-auto mb-2"
               >
                 <div className="flex items-center">
@@ -92,12 +95,12 @@ export default function FollowPage() {
 
                 {/* Follow/Unfollow Button */}
                 <div>
-                  {following[user._id] ? (
+                  {following[user._id!] ? (
                     <Button
                       className="bg-gray-400"
                       disabled={followLoading}
                       size="md"
-                      onClick={() => handleFollowUnfollow(user._id)}
+                      onClick={() => user._id && handleFollowUnfollow(user._id)} // Ensure user._id exists
                     >
                       {followLoading ? "Unfollowing..." : "Unfollow"}
                     </Button>
@@ -106,7 +109,7 @@ export default function FollowPage() {
                       color="primary"
                       disabled={followLoading}
                       size="md"
-                      onClick={() => handleFollowUnfollow(user._id)}
+                      onClick={() => user._id && handleFollowUnfollow(user._id)} // Ensure user._id exists
                     >
                       {followLoading ? "Following..." : "Follow"}
                     </Button>
