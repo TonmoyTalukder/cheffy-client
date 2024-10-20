@@ -14,31 +14,31 @@ import {
   ModalFooter,
   ModalContent,
   useDisclosure,
+  Spinner,
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { FaShareFromSquare } from "react-icons/fa6";
 import { IoDocumentLockOutline } from "react-icons/io5";
 import Image from "next/image";
-import { MdClear, MdDeleteForever } from "react-icons/md";
+import { MdClear, MdDeleteForever, MdEdit } from "react-icons/md";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { BiDownvote, BiUpvote } from "react-icons/bi";
 
 import {
+  useDeleteComment,
   useDeleteRecipe,
+  useFetchComments,
   useGetSingleRecipe,
+  usePostComment,
   useRateRecipe,
+  useUpdateComment,
   useVoteRecipe,
 } from "@/src/hooks/post.hooks";
 import { useUser } from "@/src/context/user.provider";
-import {
-  IComment,
-  Ingredient,
-  InstructionStep,
-  IRating,
-  IVote,
-} from "@/src/types";
+import { Ingredient, InstructionStep, IRating, IVote } from "@/src/types";
 import UpdateRecipeForm from "@/src/components/post/UpdateRecipeForm";
+import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
 interface IProps {
   params: {
@@ -56,11 +56,12 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
   const { mutate: voteRecipe } = useVoteRecipe();
   const { mutate: rateRecipe } = useRateRecipe();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { user: loggedUser } = useUser();
-  const [newComment, setNewComment] = useState("");
+  const { user: searchingUser } = useUser();
+  const { data: loggedUserData } = useGetSingleUser(searchingUser?._id!);
+  const loggedUser = loggedUserData?.data;
+
   const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
   const [userRating, setUserRating] = useState<number | null>(null); // Track the logged-in user's rating
   const [averageRating, setAverageRating] = useState<number>(0); // Calculated average rating
@@ -241,10 +242,10 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
   };
 
   useEffect(() => {
-    console.log("userVote => ", userVote);
-    console.log("UpvoteCount  => ", upvoteCount);
-    console.log("DownvoteCount  => ", downvoteCount);
-    console.log("Vote Data => ", voteData);
+    // console.log("userVote => ", userVote);
+    // console.log("UpvoteCount  => ", upvoteCount);
+    // console.log("DownvoteCount  => ", downvoteCount);
+    // console.log("Vote Data => ", voteData);
 
     // console.log("User Rating => ", userRating);
     // console.log("Rating Count => ", ratingCount);
@@ -275,18 +276,29 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
   const handleShare = () => {
     const recipeUrl = `${window.location.origin}/recipe/${recipeData._id}`;
 
-    navigator.clipboard.writeText(recipeUrl).then(() => alert("Link copied!"));
+    // navigator.clipboard.writeText(recipeUrl).then(() => alert("Link copied!"));
+
+    if (navigator.share) {
+      // Web Share API for mobile or supported browsers
+      navigator
+        .share({
+          title: recipeData.title,
+          text: recipeData.description,
+          url: recipeUrl,
+        })
+        .then(() => console.log("Successfully shared"))
+        .catch((error) => console.error("Error sharing", error));
+    } else {
+      // Fallback to clipboard copy for unsupported browsers
+      navigator.clipboard
+        .writeText(recipeUrl)
+        .then(() => alert("Link copied to clipboard!"))
+        .catch((error) => console.error("Failed to copy text: ", error));
+    }
   };
 
   const handlePremiumAccess = () => {
     console.log("Premium content");
-  };
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      console.log("Adding comment:", newComment);
-      setNewComment("");
-    }
   };
 
   // Handle rating update
@@ -360,18 +372,67 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
     return stars;
   };
 
-  // // Function to open the modal
-  // const handleUpdate = () => {
-  //   setVisible(true); // Open the modal when "Edit" button is clicked
-  // };
+  //! Comment
+  const [content, setContent] = useState<string>("");
+  const { mutate: postComment } = usePostComment();
+  const { data: commentsData } = useFetchComments(recipeId);
+  const { mutate: updateComment } = useUpdateComment();
+  const { mutate: deleteComment } = useDeleteComment();
 
-  // // Function to handle form submission (log the updated data)
-  // const handleFormSubmit = (updatedData: any) => {
-  //   console.log("Updated Recipe Data:", updatedData);
-  //   setVisible(false); // Close the modal after submission
-  // };
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editedContent, setEditedContent] = useState<string>("");
 
-  if (recipeLoading) return <div>Loading...</div>;
+  const handleAddComment = () => {
+    if (content.trim() && loggedUser?._id) {
+      postComment({
+        recipeId,
+        commentData: {
+          authorId: loggedUser._id,
+          content,
+        },
+      });
+      setContent(""); // Clear form after submission
+      console.log({
+        authorId: loggedUser._id,
+        content,
+      });
+    }
+  };
+
+  const handleCommentEdit = (commentId: string, currentContent: string) => {
+    setEditingCommentId(commentId);
+    setEditedContent(currentContent);
+  };
+
+  const handleCommentSaveEdit = (commentId: string) => {
+    if (editedContent.trim()) {
+      updateComment({
+        commentId,
+        updatedContent: { content: editedContent },
+      });
+    }
+
+    console.log("Saving edited comment:", commentId, editedContent);
+    setEditingCommentId(null);
+    setEditedContent("");
+  };
+
+  const handleCommentDelete = (commentId: string) => {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      // Implement delete functionality here
+      deleteComment({ commentId });
+      console.log("Deleting comment:", commentId);
+    }
+  };
+
+  console.log("CommentsData => ", commentsData);
+
+  if (recipeLoading)
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Spinner color="white" size="lg" className="my-8" />
+      </div>
+    );
   if (recipeError) return <div>Error: {recipeError.message}</div>;
 
   return (
@@ -443,7 +504,13 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
               <>
                 {/* <ModalHeader className="flex flex-col gap-1"></ModalHeader> */}
                 <ModalBody>
-                  <UpdateRecipeForm recipe={recipeData} recipeId={recipeId} />
+                  <UpdateRecipeForm
+                    recipe={{
+                      ...recipeData,
+                      authorId: recipeData.authorId._id,
+                    }}
+                    recipeId={recipeId}
+                  />
                 </ModalBody>
                 <ModalFooter className="flex justify-center items-center w-full">
                   <Button color="danger" variant="light" onPress={onClose}>
@@ -580,24 +647,144 @@ const RecipePage = ({ params: { recipeId } }: IProps) => {
                 </div>
 
                 <Divider className="my-4" />
-                <h2 className="font-bold text-xl">Comments</h2>
+                <div className="my-4">
+                  <h2 className="font-bold text-xl">Comments</h2>
+                  {commentsData?.map((comment) => (
+                    <div
+                      key={comment._id}
+                      className="flex flex-col mt-4 w-full"
+                    >
+                      <div className="flex items-start gap-4">
+                        <Avatar
+                          key={`avatar-${comment._id}`} // Add unique key here
+                          src={comment.authorId.displayPicture}
+                          alt={comment.authorId.name}
+                          size="lg"
+                          isBordered
+                          radius="full"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <strong className="text-lg">
+                                {comment.authorId.name}
+                              </strong>
+                              <p className="text-sm text-gray-500">
+                                {new Date(
+                                  comment.createdAt,
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                            {loggedUser?._id === comment.authorId._id && (
+                              <div className="flex gap-2">
+                                <Button
+                                  key={`edit-btn-${comment._id}`} // Add unique key here
+                                  size="sm"
+                                  variant="flat"
+                                  startContent={
+                                    <MdEdit
+                                      className="text-blue-500"
+                                      size={20}
+                                    />
+                                  }
+                                  onPress={() =>
+                                    handleCommentEdit(
+                                      comment._id,
+                                      comment.content,
+                                    )
+                                  }
+                                />
+                                <Button
+                                  key={`delete-btn-${comment._id}`} // Add unique key here
+                                  size="sm"
+                                  variant="flat"
+                                  startContent={
+                                    <MdDeleteForever
+                                      className="text-red-500"
+                                      size={20}
+                                    />
+                                  }
+                                  onPress={() =>
+                                    handleCommentDelete(comment._id)
+                                  }
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {editingCommentId === comment._id ? (
+                            <div className="mt-2">
+                              <Textarea
+                                key={`textarea-${comment._id}`} // Add unique key here
+                                value={editedContent}
+                                onChange={(e) =>
+                                  setEditedContent(e.target.value)
+                                }
+                                placeholder="Edit your comment"
+                                minRows={2}
+                                maxRows={4}
+                                className="mb-2"
+                              />
+                              <Button
+                                key={`save-btn-${comment._id}`} // Add unique key here
+                                className="mr-2"
+                                variant="solid"
+                                color="primary"
+                                onPress={() =>
+                                  handleCommentSaveEdit(comment._id)
+                                }
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                key={`cancel-btn-${comment._id}`} // Add unique key here
+                                variant="light"
+                                color="danger"
+                                onPress={() => setEditingCommentId(null)}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <p className="text-gray-600 mt-2">
+                              {comment.content}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <Divider className="my-2" />
+                    </div>
+                  ))}
+                </div>
+                <Divider className="my-4" />
+                {/* <h2 className="font-bold text-xl">Comments</h2>
                 {recipeData.comments.map((comment: IComment, idx: number) => (
                   <div key={idx} className="mt-2">
                     <strong>{comment.authorId.name}</strong>
                     <p className="text-gray-600">{comment.content}</p>
                     <Divider />
                   </div>
-                ))}
+                ))} */}
                 <Textarea
                   placeholder="Write your comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
+                  value={content}
+                  onChange={(e) => {
+                    setContent(e.target.value);
+                    // setTimeout(() => {
+                    //   window.location.reload(); // Reload the window after 1 second
+                    // }, 1000);
+                  }}
                   className="mb-2"
                 />
                 <Button
                   className="mt-2"
                   variant="solid"
-                  onPress={handleAddComment}
+                  onPress={() => {
+                    handleAddComment();
+                    setTimeout(() => {
+                      window.location.reload(); // Reload the window after 1 second
+                    }, 500);
+                  }}
                 >
                   Add Comment
                 </Button>

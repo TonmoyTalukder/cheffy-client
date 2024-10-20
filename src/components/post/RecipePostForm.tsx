@@ -140,6 +140,10 @@ const RecipePostForm = () => {
     console.log(newRecipe);
     // Submit the newRecipe object to the backend (e.g., API call)
     handleCreatePost(newRecipe);
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
   };
 
   const removeTag = (tagToRemove: string) => {

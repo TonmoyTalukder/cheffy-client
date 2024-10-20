@@ -14,7 +14,7 @@ export const siteConfig = {
     },
     {
       label: <PiListStarFill style={{ fontSize: "30", marginTop: "4" }} />,
-      href: "/blog",
+      href: "/premium-recipes",
     },
     {
       label: <FaUserFriends style={{ fontSize: "30", marginTop: "4" }} />,
@@ -28,7 +28,7 @@ export const siteConfig = {
     },
     {
       label: <PiListStarFill style={{ fontSize: "30", marginTop: "4" }} />,
-      href: "/blog",
+      href: "/premium-recipes",
     },
     {
       label: "Profile",

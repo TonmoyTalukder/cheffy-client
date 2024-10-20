@@ -66,8 +66,14 @@ export default function FollowPage() {
   }
 
   return (
-    <ScrollShadow hideScrollBar>
-      <div className="w-auto xl:mx-80 lg:mx-60 md:mx-40 mx-5 max-h-[92vh]">
+    <ScrollShadow
+      className="flex flex-col justify-center items-center"
+      hideScrollBar
+            style={{
+        marginTop: "5%",
+      }}
+    >
+      <div className="xl:w-4/12 lg:w-4/12 md:w-5/12 sm:w-auto max-h-[92vh]">
         <h1 className="text-center my-3">Suggested Patrons to Follow</h1>
         <div className="grid grid-cols-1 gap-1 w-full mb-3">
           {data && data.data.length > 0 ? (
@@ -125,3 +131,26 @@ export default function FollowPage() {
     </ScrollShadow>
   );
 }
+
+
+
+
+
+// export default function FollowLayout({
+//   children,
+// }: {
+//   children: React.ReactNode;
+// }) {
+//   return (
+//     <section
+//       className="flex flex-col justify-center items-center w-full"
+//       style={{
+//         marginTop: "5%",
+//       }}
+//     >
+//       <div className="w-screen flex flex-col justify-center items-center">
+//         {children}
+//       </div>
+//     </section>
+//   );
+// }

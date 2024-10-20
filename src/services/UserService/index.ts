@@ -2,6 +2,8 @@
 "use server";
 
 import { FieldValues } from "react-hook-form";
+import { cookies } from "next/headers";
+import { jwtDecode } from "jwt-decode";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 
@@ -22,6 +24,42 @@ export const getSingleUser = async (id: string) => {
 export const updateUser = async (id: string, userData: FieldValues) => {
   try {
     const { data } = await axiosInstance.put(`/users/${id}`, userData);
+
+    if (data.success) {
+      // Retrieve the current access token from cookies
+      const currentAccessToken = cookies().get("accessToken")?.value;
+      const currentRefreshToken = cookies().get("refreshToken")?.value;
+
+      if (currentAccessToken) {
+        // Decode the access token to get the user data
+        const decodedToken: any = jwtDecode(currentAccessToken);
+
+        // Manually update the decoded token's user data with the new data
+        const updatedUser = {
+          ...decodedToken,
+          ...userData, // Merge the updated user fields from userData
+        };
+
+        cookies().set("accessToken", currentAccessToken);
+
+        return updatedUser;
+      }
+
+      if (currentRefreshToken) {
+        // Decode the access token to get the user data
+        const decodedToken: any = jwtDecode(currentRefreshToken);
+
+        // Manually update the decoded token's user data with the new data
+        const updatedUser = {
+          ...decodedToken,
+          ...userData, // Merge the updated user fields from userData
+        };
+
+        cookies().set("refreshToken", currentRefreshToken);
+
+        return updatedUser;
+      }
+    }
 
     return data;
   } catch (error: any) {

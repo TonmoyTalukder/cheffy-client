@@ -6,19 +6,29 @@ import {
   CardFooter,
   CardHeader,
   Avatar,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalBody,
+  ModalFooter,
+  Spinner,
 } from "@nextui-org/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiUpvote, BiDownvote } from "react-icons/bi";
 import { FaShareFromSquare } from "react-icons/fa6";
 import { PiSealCheckFill } from "react-icons/pi";
 import { FaRegEdit } from "react-icons/fa";
 import { IoDocumentLockOutline } from "react-icons/io5";
-import { MdDeleteForever } from "react-icons/md";
+import { MdDeleteForever, MdOutlineReportProblem } from "react-icons/md";
 import { Link } from "@nextui-org/react";
 
 import { useUser } from "@/src/context/user.provider";
-import { useDeleteRecipe, useFetchRecipes } from "@/src/hooks/post.hooks";
+import {
+  useDeleteRecipe,
+  useFetchRecipes,
+  useVoteRecipe,
+} from "@/src/hooks/post.hooks";
 import {
   IComment,
   Ingredient,
@@ -26,6 +36,10 @@ import {
   IRating,
   IVote,
 } from "@/src/types";
+
+import UpdateRecipeForm from "./UpdateRecipeForm";
+import PremiumModal from "../modal/PremiumModal";
+import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
 export interface IAuthor {
   _id: string;
@@ -53,7 +67,7 @@ export interface RecipeInterface {
   authorId: IAuthor;
   premium: boolean;
   comments: IComment[];
-  diet?: string;
+  diet: string;
 }
 
 interface UserRecipePostProps {
@@ -70,14 +84,22 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
     isLoading: recipeLoading,
     error: recipeError,
   } = useFetchRecipes();
-  const { user: loogedUser } = useUser();
+  const { user: searchingUser } = useUser();
+  const { data: loggedUserData } = useGetSingleUser(searchingUser?._id!);
+  const loggedUser = loggedUserData?.data;
 
-  console.log("Looged User => ", loogedUser);
+  const { mutate: voteRecipe } = useVoteRecipe();
+
+  console.log("Looged User => ", loggedUser);
+
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+
+  const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
 
   const deleteRecipeMutation = useDeleteRecipe();
   const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null);
 
-  const recipeOwner = loogedUser?._id === profileId;
+  const recipeOwner = loggedUser?._id === profileId;
 
   // Sort the recipes by creation date (newest first)
   const sortedRecipes =
@@ -143,7 +165,57 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
     }
   };
 
-  if (recipeLoading) return <div>Loading...</div>;
+  useEffect(() => {
+    if (loggedUser && recipeData?.votes?.length > 0) {
+      const userVoteData = recipeData.votes.find(
+        (vote: { id: string | undefined }) => vote.id === loggedUser._id,
+      );
+
+      if (userVoteData) {
+        setUserVote(userVoteData.upvote ? "upvote" : "downvote");
+      }
+    }
+  }, []);
+
+  const handleVote = (recipeId: string, voteType: "upvote" | "downvote") => {
+    // Use mutation for voting
+    if (loggedUser?._id) {
+      const voteData = {
+        id: loggedUser?._id,
+        upvote:
+          voteType === "upvote" && userVote == "downvote"
+            ? true
+            : voteType === "upvote" && userVote == null
+              ? true
+              : false,
+        downvote:
+          voteType === "downvote" && userVote == "upvote"
+            ? true
+            : voteType === "downvote" && userVote == null
+              ? true
+              : false,
+      };
+
+      console.log("Vote Data => ", voteData);
+
+      voteRecipe({
+        recipeId,
+        userId: loggedUser._id,
+        voteData,
+      });
+
+      setUserVote(voteType === "upvote" ? "upvote" : "downvote");
+    }
+  };
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  if (recipeLoading)
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Spinner color="white" size="lg" className="my-8" />
+      </div>
+    );
   if (recipeError) return <div>Error: {recipeError.message}</div>;
 
   // console.log("filteredRecipes => ", filteredRecipes);
@@ -197,14 +269,14 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
               />
             ) : (
               <Button
-                className="bg-transparent text-foreground border-default-200"
-                color="primary"
-                radius="full"
+                startContent={
+                  <MdOutlineReportProblem className="text-red-500" size={24} />
+                }
                 size="sm"
-                variant="bordered"
-              >
-                Follow
-              </Button>
+                variant="flat"
+                // onPress={() => handleDelete(recipe._id, recipe.title)}
+                className="ml-auto"
+              />
             )}
           </CardHeader>
 
@@ -246,14 +318,13 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 `${stripHtmlTags(recipe.description).substring(0, 100)}...`
               )}
             </div>
-            {!loogedUser?.isPremium && recipe.premium ? (
+            {!loggedUser?.isPremium && recipe.premium ? (
               <Button
                 startContent={<IoDocumentLockOutline size={18} />}
-                onPress={() => console.log("Premium Content")}
+                onPress={() => setIsPremiumModalOpen(true)}
                 className="mt-2 bg-amber-400"
                 size="sm"
               >
-                {/* {expandedRecipe === recipe._id ? "Show Less" : "Read More"} */}
                 Premium Recipe
               </Button>
             ) : (
@@ -266,6 +337,15 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 {expandedRecipe === recipe._id ? "Show Less" : "Read More"}
               </Button>
             )}
+
+            {loggedUser && (
+              <PremiumModal
+                isOpen={isPremiumModalOpen}
+                onClose={() => setIsPremiumModalOpen(false)}
+                user={loggedUser}
+              />
+            )}
+
             {expandedRecipe === recipe._id && (
               <div className="mt-4">
                 <Divider />
@@ -283,7 +363,7 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 <h1 className="text-gray-600 mt-2">Instructions:</h1>
                 <ol className="list-decimal list-inside">
                   {recipe.instructions.map((instruction, idx) => (
-                    <li key={idx}>{instruction.details}</li>
+                    <li key={idx}>{stripHtmlTags(instruction.details)}</li>
                   ))}
                 </ol>
               </div>
@@ -297,6 +377,7 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 startContent={<BiUpvote className="text-green-500" size={24} />}
                 size="sm"
                 variant="flat"
+                onPress={() => handleVote(recipe._id, "upvote")}
               >
                 {getVoteCounts(recipe).upvoteCount}
               </Button>
@@ -304,13 +385,11 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 startContent={<BiDownvote className="text-red-500" size={24} />}
                 size="sm"
                 variant="flat"
+                onPress={() => handleVote(recipe._id, "downvote")}
               >
                 {getVoteCounts(recipe).downvoteCount}
               </Button>
             </div>
-            {/* <p className="text-gray-400 text-sm">
-                {new Date(recipe.createdAt).toLocaleDateString()}
-              </p> */}
             <div className="flex items-center gap-4">
               {recipeOwner && (
                 <Button
@@ -319,6 +398,7 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                   }
                   size="sm"
                   variant="flat"
+                  onPress={onOpen}
                 />
               )}
               <Button
@@ -331,6 +411,32 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
               />
             </div>
           </CardFooter>
+          {/* Modal for editing recipe */}
+          <Modal
+            backdrop={"blur"}
+            isOpen={isOpen}
+            scrollBehavior={"outside"}
+            onOpenChange={onOpenChange}
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  {/* <ModalHeader className="flex flex-col gap-1"></ModalHeader> */}
+                  <ModalBody>
+                    <UpdateRecipeForm
+                      recipe={{ ...recipe, authorId: recipe.authorId._id }}
+                      recipeId={recipe._id}
+                    />
+                  </ModalBody>
+                  <ModalFooter className="flex justify-center items-center w-full">
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
         </Card>
       ))}
     </div>

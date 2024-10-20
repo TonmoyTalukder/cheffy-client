@@ -187,6 +187,9 @@ const EditProfileModal = ({
     };
 
     onUpdate(finalData);
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
     handleClose();
   };
 
@@ -416,7 +419,15 @@ const EditProfileModal = ({
             <Button color="danger" variant="light" onPress={handleClose}>
               Cancel
             </Button>
-            <Button color="primary" onPress={handleUpdate}>
+            <Button
+              color="primary"
+              onPress={() => {
+                handleUpdate();
+                // setTimeout(() => {
+                //   window.location.reload(); // Reload the window
+                // }, 1000);
+              }}
+            >
               Save Changes
             </Button>
           </ModalFooter>

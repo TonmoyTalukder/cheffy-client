@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 
+import LoadingRecipeCard from "@/src/components/feed/LoadingRecipeCard";
+import PremiumRecipeFeed from "@/src/components/feed/PremiumRecipeFeed";
 import { useUser } from "@/src/context/user.provider";
-import RecipeFeed from "@/src/components/feed/RecipeFeed";
 
-export default function Home() {
+export default function BlogPage() {
   useEffect(() => {
     if (typeof window !== "undefined" && !sessionStorage.getItem("reloaded")) {
       // Reload the page and set a flag to avoid infinite loop
@@ -13,12 +14,18 @@ export default function Home() {
       window.location.reload();
     }
   }, []);
+
   const { user, isLoading } = useUser();
 
   const loggedUserId = user?._id;
 
-  console.log("User => ", user);
-  console.log("isLoading => ", isLoading);
+  if (isLoading) {
+    return (
+      <div className="recipe-feed-container xl:w-5/12 lg:w-5/12 md:w-7/12 sm:w-auto">
+        <LoadingRecipeCard />
+      </div>
+    );
+  }
 
   return (
     <section
@@ -27,12 +34,7 @@ export default function Home() {
       }}
       className="flex flex-col items-center justify-center gap-4 py-8 md:py-10"
     >
-      {/* <div className="inline-block max-w-xl text-center justify-center">
-        <span className={title()}>Hello&nbsp;</span>
-        <span className={title({ color: "violet" })}>Cheffy!</span>
-      </div>
-      <p>Hi, {user?.name}</p> */}
-      {loggedUserId && <RecipeFeed userId={loggedUserId} />}
+      {loggedUserId && <PremiumRecipeFeed userId={loggedUserId} />}
     </section>
   );
 }

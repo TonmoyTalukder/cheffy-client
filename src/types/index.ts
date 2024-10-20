@@ -56,21 +56,21 @@ export interface IUser {
 
 export interface IRecipe {
   _id: string;
-  title: string; // Recipe title
-  description: string; // Brief description of the recipe
-  ingredients: Ingredient[]; // List of ingredients for the recipe
-  instructions: InstructionStep[]; // Array of detailed cooking steps
-  image: string; // URL of the image of the recipe
-  cookingTime: number; // Estimated cooking time in minutes
-  ratings: IRating[]; // Average rating of the recipe (1-5)
-  ratingsCount: number; // Count of ratings given
-  tags: string[]; // Tags related to the recipe (e.g., "vegetarian", "gluten-free")
-  votes: IVote[]; // Number of votes received
-  createdAt: Date; // Timestamp of recipe creation
-  updatedAt: Date; // Timestamp of last update
-  authorId: string; // ID of the user who created the recipe
-  premium: boolean; // Flag indicating if the recipe is for premium users only
-  comments: IComment[]; // List of comments on the recipe
+  title: string;
+  description: string;
+  ingredients: Ingredient[];
+  instructions: InstructionStep[];
+  image: string;
+  cookingTime: number;
+  ratings: IRating[];
+  ratingsCount: number;
+  tags: string[];
+  votes: IVote[];
+  createdAt: Date;
+  updatedAt: Date;
+  authorId: string;
+  premium: boolean;
+  comments: IComment[];
   diet: string;
 }
 
@@ -97,7 +97,7 @@ export interface InstructionStep {
 }
 
 export interface IComment {
-  id: string; // Unique identifier for the comment
+  _id: string; // Unique identifier for the comment
   authorId: {
     _id: string;
     name: string; // Author's name

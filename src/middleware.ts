@@ -6,6 +6,9 @@ import { getCurrentUser } from "./services/AuthService";
 // Define routes that don't require authentication
 const AuthRoutes = ["/login", "/signup"];
 
+// Define routes that are only accessible by admin users
+const AdminRoutes = ["/admin-dashboard", "/admin-recipe", "/admin-user"];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl; // Get the current path of the request
 
@@ -25,16 +28,42 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // If the user is logged in and tries to access login or signup, redirect to home page
-  if (user && AuthRoutes.includes(pathname)) {
+  // If the user is logged in and has the role 'ADMIN'
+  if (user.role === "ADMIN") {
+    // If the admin is trying to access admin routes, allow it
+    if (AdminRoutes.includes(pathname)) {
+      return NextResponse.next();
+    }
+
+    // If the admin tries to access non-admin pages, redirect them to admin dashboard
+    return NextResponse.redirect(new URL("/admin-dashboard", request.url));
+  }
+
+  // If the user is not an admin and tries to access an admin-only route, redirect to home
+  if (AdminRoutes.includes(pathname) && user.role !== "ADMIN") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // If authenticated, allow access to the requested page
+  // If the user is logged in and tries to access login or signup, redirect to home page
+  if (AuthRoutes.includes(pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // If authenticated and not an admin, allow access to the requested page
   return NextResponse.next();
 }
 
 // Configuration to specify matching routes
 export const config = {
-  matcher: ["/", "/profile", "/profile/:page*", "/admin", "/login", "/signup"],
+  matcher: [
+    "/",
+    "/profile",
+    "/profile/:page*",
+    "/recipe/:page*",
+    "/admin-dashboard",
+    "/admin-recipe",
+    "/admin-user",
+    "/login",
+    "/signup",
+  ],
 };

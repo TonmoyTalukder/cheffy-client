@@ -10,6 +10,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
   useDisclosure,
 } from "@nextui-org/react";
 import Image from "next/image";
@@ -53,6 +54,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     isPending: premiumPayPending,
   } = usePremiumPayment(profileId);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !sessionStorage.getItem("reloaded")) {
+      // Reload the page and set a flag to avoid infinite loop
+      sessionStorage.setItem("reloaded", "true");
+      window.location.reload();
+    }
+  }, []);
 
   // State
   const [user, setUser] = useState<IUser | null>(null);
@@ -156,8 +165,8 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     console.log("Payment res: ", response.data.paymentSession.payment_url);
 
     if (paymentUrl) {
-      // Redirect user to the payment URL
-      window.open(paymentUrl);
+      // Redirect user to the payment URL in the current tab
+      window.location.href = paymentUrl;
     }
   };
 
@@ -186,7 +195,12 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     handleFollowUser(targetUserId);
   };
 
-  if (isLoading) return <div className="text-center">Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Spinner color="white" size="lg" className="my-8" />
+      </div>
+    );
   if (error) {
     return (
       <div className="text-red-500 text-center">Error loading user data</div>
@@ -483,34 +497,34 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
                       {/* Follow/Unfollow Button */}
                       <div>
-                        {isFollowing ? (
-                          <Button
-                            className="bg-gray-400"
-                            size="md"
-                            onClick={() => {
-                              handleFollowUnfollow(follower.id);
-                              setTimeout(() => {
-                                window.location.reload(); // Reload the window
-                              }, 500);
-                            }}
-                          >
-                            {followLoading ? "Unfollowing..." : "Unfollow"}
-                          </Button>
-                        ) : (
-                          <Button
-                            color="primary"
-                            disabled={followLoading}
-                            size="md"
-                            onClick={() => {
-                              handleFollowUnfollow(follower.id);
-                              setTimeout(() => {
-                                window.location.reload(); // Reload the window
-                              }, 500);
-                            }}
-                          >
-                            {followLoading ? "Following..." : "Follow"}
-                          </Button>
-                        )}
+                        {/* {isFollowing ? ( */}
+                        {/* <Button
+                          className="bg-gray-400"
+                          size="md"
+                          onClick={() => {
+                            handleFollowUnfollow(follower.id);
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 500);
+                          }}
+                        >
+                          {followLoading ? "Unfollowing..." : "Unfollow"}
+                        </Button> */}
+                        {/* ) : ( */}
+                        <Button
+                          color="primary"
+                          disabled={followLoading}
+                          size="md"
+                          onClick={() => {
+                            handleFollowUnfollow(follower.id);
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 500);
+                          }}
+                        >
+                          {followLoading ? "Following..." : "Follow"}
+                        </Button>
+                        {/* )} */}
                       </div>
                     </div>
                   ))}
@@ -549,21 +563,21 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
                       {/* Follow/Unfollow Button */}
                       <div>
-                        {isFollowing ? (
-                          <Button
-                            className="bg-gray-400"
-                            size="md"
-                            onClick={() => {
-                              handleFollowUnfollow(follow.id);
-                              setTimeout(() => {
-                                window.location.reload(); // Reload the window
-                              }, 500);
-                            }}
-                          >
-                            {followLoading ? "Unfollowing..." : "Unfollow"}
-                          </Button>
-                        ) : (
-                          <Button
+                        {/* {isFollowing ? ( */}
+                        <Button
+                          className="bg-gray-400"
+                          size="md"
+                          onClick={() => {
+                            handleFollowUnfollow(follow.id);
+                            setTimeout(() => {
+                              window.location.reload(); // Reload the window
+                            }, 500);
+                          }}
+                        >
+                          {followLoading ? "Unfollowing..." : "Unfollow"}
+                        </Button>
+                        {/* ) : ( */}
+                        {/* <Button
                             color="primary"
                             disabled={followLoading}
                             size="md"
@@ -575,8 +589,8 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             }}
                           >
                             {followLoading ? "Following..." : "Follow"}
-                          </Button>
-                        )}
+                          </Button> */}
+                        {/* )} */}
                       </div>
                     </div>
                   ))}

@@ -17,7 +17,11 @@ interface UpdateRecipeFormProps {
   recipeId: any;
 }
 
-const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
+function stripHtmlTags(html: string): string {
+  return html.replace(/<[^>]*>/g, "");
+}
+
+const UpdateRecipeForm = ({ recipe, recipeId }: UpdateRecipeFormProps) => {
   const { mutate: handleUpdatePost } = useUpdateRecipe(); //isPending, isSuccess
 
   const [title, setTitle] = useState<string>(recipe.title || "");
@@ -49,6 +53,7 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
   const [diet, setDiet] = useState<Set<string>>(
     new Set(recipe.diet.split(", ")),
   );
+  // const [authorId, setAuthorId] = useState<string>("");
   const { user } = useUser();
   const profileId = user?._id;
 
@@ -64,6 +69,7 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
       setImagePreview(recipe.image);
       setIsPremium(recipe.premium);
       setDiet(new Set(recipe.diet.split(", ")));
+      // setAuthorId(recipe.authorId.id);
     }
   }, [recipe]);
 
@@ -138,12 +144,12 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
         return;
       }
     }
-
     const selectedDiet = Array.from(diet).join(", ");
 
     const updatedRecipe: IRecipe = {
       ...recipe, // Use the existing recipe object and overwrite with updated data
       title,
+      // authorId: recipe.authorId._id,
       description,
       ingredients,
       instructions,
@@ -158,9 +164,13 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
     // Submit the updatedRecipe object to the backend (e.g., API call)
     try {
       console.log("updatedRecipe => ", updatedRecipe);
-      await handleUpdatePost({ recipeId, postData: updatedRecipe }); // Call the API function to send the updated recipe
-      alert("Recipe updated successfully!");
-      //   setIsEditing(false); // Set back to view mode (if managed in RecipePage)
+      const res = await handleUpdatePost({ recipeId, postData: updatedRecipe }); // Call the API function to send the updated recipe
+
+      console.log(" res update recipe => ", res);
+      alert("Update recipe updated successfully!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Failed to update recipe:", error);
     }
@@ -219,7 +229,7 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
         <ul className="list-disc pl-5">
           {ingredients.map((ingredient, index) => (
             <li key={index} className="text-gray-700">
-              {ingredient.amount} of {ingredient.name}
+              {ingredient.amount} of {stripHtmlTags(ingredient.name)}
             </li>
           ))}
         </ul>
@@ -358,7 +368,15 @@ const UpdateRecipeForm = ({ recipe }: UpdateRecipeFormProps, recipeId: any) => {
 
       {/* Submit */}
       <div className="text-center">
-        <Button size="lg" onClick={handleFormSubmit}>
+        <Button
+          size="lg"
+          onClick={() => {
+            handleFormSubmit();
+            // setTimeout(() => {
+            //   window.location.reload(); // Reload the window after 1 second
+            // }, 1000);
+          }}
+        >
           Update Recipe
         </Button>
       </div>
