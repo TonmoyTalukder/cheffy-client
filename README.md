@@ -1,53 +1,53 @@
-# Next.js & NextUI Template
+# Cheffy
 
-This is a template for creating applications using Next.js 14 (app directory) and NextUI (v2).
+## Introduction
 
-[Try it on CodeSandbox](https://githubbox.com/nextui-org/next-app-template)
+The project is a recipe sharing social media platform. 
 
-## Technologies Used
+## Project Description
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [NextUI v2](https://nextui.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+Purpose of this project is developing a recipe sharing social media platform with NextJs using TypeScript, that user can easily share recipe, vote or rate recipe. As admin user can manage recipe and users. The feed shows ranking based data.Ranking calculates ratings, votes, logging user's food diet and more. Users can be premium for one month to see premium recipes.
 
-## How to Use
+## Features
 
-### Use the template with create-next-app
+**USERS**
+- Post Recipe
+- Comment
+- Search 
+- Vote, Rate, Report, Print Recipe
 
-To create a new project based on this template using `create-next-app`, run the following command:
+**ADMIN**
+- Admin can change user role
+- Create User
+- Block user
+- Delete Recipe
 
-```bash
-npx create-next-app -e https://github.com/nextui-org/next-app-template
-```
+## Technology Stack
 
-### Install dependencies
+**Frontend**
+- Next JS
+- TanStack Query
+- TypeScript
+- Next UI
+- Tailwind CSS
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+**Backend**
+- Node Js
+- Express Js
+- TypeScript
 
-```bash
-npm install
-```
+**Database**
+- NoSQL
+- MongoDB
+- Mongoose 
 
-### Run the development server
+### Installation Steps
 
-```bash
-npm run dev
-```
+1. git clone https://github.com/TonmoyTalukder/cheffy-client.git
+2. cd /path/to/your/directory
+3. yarn
+4. yarn run dev
 
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@nextui-org/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
-
-Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).
+### Admin Credentials
+Email:  ph@admin.com
+Password: 123456
