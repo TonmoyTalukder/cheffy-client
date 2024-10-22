@@ -22,12 +22,16 @@ import { PiSealCheckFill } from "react-icons/pi";
 import clsx from "clsx";
 
 import { useUser } from "@/src/context/user.provider";
-import { useDeleteRecipe, useVoteRecipe } from "@/src/hooks/post.hooks";
+import {
+  useDeleteRecipe,
+  useReportRecipe,
+  useVoteRecipe,
+} from "@/src/hooks/post.hooks";
+import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
 import { RecipeInterface } from "../post/UserRecipePost";
 import UpdateRecipeForm from "../post/UpdateRecipeForm";
 import PremiumModal from "../modal/PremiumModal";
-import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
 interface RecipeCardProps {
   recipe: RecipeInterface;
@@ -45,6 +49,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const { mutate: voteRecipe } = useVoteRecipe();
   const deleteRecipeMutation = useDeleteRecipe();
   const recipeOwner = loggedUser?._id === recipe.authorId._id;
+
+  const reportRecipeMutation = useReportRecipe();
 
   const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
   const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null);
@@ -120,6 +126,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     }
   };
 
+  const handleReport = (id: string, title: string) => {
+    if (
+      window.confirm(`Are you sure you want to report the recipe "${title}"?`)
+    ) {
+      reportRecipeMutation.mutate(id);
+      console.log("Reported id = ", id);
+    }
+  };
+
   const handleShare = () => {
     const recipeUrl = `${window.location.origin}/recipe/${recipe._id}`;
 
@@ -157,10 +172,16 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         />
         <div className="ml-3">
           {/* <p className="font-semibold">{recipe.authorId.name}</p> */}
-          <h4 className="font-bold text-lg flex flex-row">
-            {recipe.authorId.name}{" "}
-            {recipe.authorId?.isPremium && <PiSealCheckFill />}
-          </h4>
+          <Link
+            href={`${window.location.origin}/profile/${recipe.authorId._id}`}
+            color="foreground"
+            className="flex justify-between w-full"
+          >
+            <h4 className="font-bold text-lg flex flex-row">
+              {recipe.authorId.name}{" "}
+              {recipe.authorId?.isPremium && <PiSealCheckFill />}
+            </h4>
+          </Link>
           <p className="text-xs text-gray-500">
             {new Date(recipe.createdAt).toLocaleDateString()}
           </p>
@@ -183,7 +204,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             }
             size="sm"
             variant="flat"
-            // onPress={() => handleDelete(recipe._id, recipe.title)}
+            onPress={() => handleReport(recipe._id, recipe.title)}
             className="ml-auto"
           />
         )}

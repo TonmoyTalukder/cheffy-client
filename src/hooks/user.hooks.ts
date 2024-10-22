@@ -5,11 +5,32 @@ import { FieldValues } from "react-hook-form";
 
 import {
   followUser,
+  getAllUsers,
   getSingleUser,
   patronSuggestion,
   premiumPayment,
+  reportUser,
   updateUser,
 } from "../services/UserService";
+
+// Fetch all users
+export const useGetAllUsers = () => {
+  return useQuery({
+    queryKey: ["GET_ALL_USERS"], // Unique query key for caching
+    queryFn: async () => {
+      try {
+        const data = await getAllUsers(); // Call the service function to fetch all users
+
+        console.log("Users data from hooks =>", data);
+
+        return data;
+      } catch (error) {
+        toast.error("Failed to fetch users data.");
+        throw error; // Ensure react-query handles it as an error
+      }
+    },
+  });
+};
 
 // Fetch single user
 export const useGetSingleUser = (id: string) => {
@@ -48,6 +69,49 @@ export const useUpdateUser = (id: string) => {
     },
     onError: (error: { message: any }) => {
       toast.error(error.message);
+      console.log(error);
+    },
+  });
+};
+
+export const useUpdateUserDynamicID = () => {
+  return useMutation<any, Error, { id: string; userData: FieldValues }>({
+    mutationKey: ["USER_UPDATE"],
+    mutationFn: async ({ id, userData }) => {
+      console.log("Sending user data:", userData); // Log the userData being sent
+      const response = await updateUser(id, userData);
+
+      console.log("Response from server:", response); // Log the response from the server
+
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("User updated successfully.");
+    },
+    onError: (error: { message: any }) => {
+      toast.error(error.message);
+      console.log(error);
+    },
+  });
+};
+
+// Report user
+export const useReportUser = () => {
+  return useMutation<any, Error, string>({
+    mutationKey: ["USER_REPORT"],
+    mutationFn: async (userId: string) => {
+      console.log("Reporting user:", userId); // Log the userId being reported
+      const response = await reportUser(userId);
+
+      console.log("Response from server:", response); // Log the response from the server
+
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("User reported successfully.");
+    },
+    onError: (error: { message: any }) => {
+      toast.error(error.message || "Error reporting the user.");
       console.log(error);
     },
   });

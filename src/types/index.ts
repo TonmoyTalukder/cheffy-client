@@ -49,8 +49,9 @@ export interface IUser {
   sex: string;
   topics?: Array<string>;
   isPremium?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  report: number;
+  createdAt: string;
+  updatedAt: string;
   __v?: number;
 }
 

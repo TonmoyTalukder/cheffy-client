@@ -1,9 +1,6 @@
 /* eslint-disable no-console */
 "use client";
 
-import envConfig from "@/src/config/envConfig";
-import { usePremiumPayment, useUpdateUser } from "@/src/hooks/user.hooks";
-import { IUser } from "@/src/types";
 import {
   Button,
   Modal,
@@ -15,6 +12,10 @@ import {
 import axios from "axios";
 import { useState } from "react";
 import { PiSealCheckFill } from "react-icons/pi";
+
+import { IUser } from "@/src/types";
+import { usePremiumPayment, useUpdateUser } from "@/src/hooks/user.hooks";
+import envConfig from "@/src/config/envConfig";
 
 interface IEditProfileModalProps {
   isOpen: boolean;

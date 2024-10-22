@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, Button, ScrollShadow } from "@nextui-org/react";
+import { Avatar, Button, ScrollShadow, Spinner } from "@nextui-org/react";
 import Link from "next/link";
 
 import { usePatronSuggestion, useFollowUser } from "@/src/hooks/user.hooks";
@@ -58,7 +58,16 @@ export default function FollowPage() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        style={{
+          marginTop: "10%",
+        }}
+        className="flex flex-col justify-center items-center"
+      >
+        <Spinner color="primary" size="lg" className="my-8" />
+      </div>
+    );
   }
 
   if (error) {
@@ -69,72 +78,77 @@ export default function FollowPage() {
     <ScrollShadow
       className="flex flex-col justify-center items-center"
       hideScrollBar
-            style={{
-        marginTop: "5%",
+      style={{
+        marginTop: "6.5vh",
       }}
     >
-      <div className="xl:w-4/12 lg:w-4/12 md:w-5/12 sm:w-auto max-h-[92vh]">
-        <h1 className="text-center my-3">Suggested Patrons to Follow</h1>
+      <div className="xl:w-4/12 lg:w-4/12 md:w-5/12 sm:w-auto max-h-[92vh] mt-8 md:mt-10 sm:mt-0">
+        {data && data.data.length > 0 && (
+          <h1 className="text-center my-3">Suggested Patrons to Follow</h1>
+        )}
         <div className="grid grid-cols-1 gap-1 w-full mb-3">
           {data && data.data.length > 0 ? (
-            data.data.map((user: IUser) => (
-              <div
-                key={user._id} // Assuming user._id exists for all
-                className="flex items-center justify-between p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 w-auto mb-2"
-              >
-                <div className="flex items-center">
-                  {/* Profile Picture */}
-                  <Avatar
-                    className="border-4 object-cover mr-4"
-                    src={
-                      user.displayPicture ||
-                      "https://i.ibb.co/wcv1QBQ/5951752.png"
-                    }
-                  />
-                  <div>
-                    {/* Patron Name */}
-                    <h4 className="font-semibold">
-                      <Link href={`/profile/${user._id}`}>{user.name}</Link>
-                    </h4>
-                  </div>
-                </div>
+            data.data.map(
+              (user: IUser) =>
+                user.role === "USER" && (
+                  <div
+                    key={user._id} // Assuming user._id exists for all
+                    className="flex items-center justify-between p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 w-auto mb-2"
+                  >
+                    <div className="flex items-center">
+                      {/* Profile Picture */}
+                      <Avatar
+                        className="border-4 object-cover mr-4"
+                        src={
+                          user.displayPicture ||
+                          "https://i.ibb.co/wcv1QBQ/5951752.png"
+                        }
+                      />
+                      <div>
+                        {/* Patron Name */}
+                        <h4 className="font-semibold">
+                          <Link href={`/profile/${user._id}`}>{user.name}</Link>
+                        </h4>
+                      </div>
+                    </div>
 
-                {/* Follow/Unfollow Button */}
-                <div>
-                  {following[user._id!] ? (
-                    <Button
-                      className="bg-gray-400"
-                      disabled={followLoading}
-                      size="md"
-                      onClick={() => user._id && handleFollowUnfollow(user._id)} // Ensure user._id exists
-                    >
-                      {followLoading ? "Unfollowing..." : "Unfollow"}
-                    </Button>
-                  ) : (
-                    <Button
-                      color="primary"
-                      disabled={followLoading}
-                      size="md"
-                      onClick={() => user._id && handleFollowUnfollow(user._id)} // Ensure user._id exists
-                    >
-                      {followLoading ? "Following..." : "Follow"}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))
+                    {/* Follow/Unfollow Button */}
+                    <div>
+                      {following[user._id!] ? (
+                        <Button
+                          className="bg-gray-400"
+                          disabled={followLoading}
+                          size="md"
+                          onClick={() =>
+                            user._id && handleFollowUnfollow(user._id)
+                          } // Ensure user._id exists
+                        >
+                          {followLoading ? "Unfollowing..." : "Unfollow"}
+                        </Button>
+                      ) : (
+                        <Button
+                          color="primary"
+                          disabled={followLoading}
+                          size="md"
+                          onClick={() =>
+                            user._id && handleFollowUnfollow(user._id)
+                          } // Ensure user._id exists
+                        >
+                          {followLoading ? "Following..." : "Follow"}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ),
+            )
           ) : (
-            <p>No suggested patrons available.</p>
+            <p className="text-center">No suggested patrons available.</p>
           )}
         </div>
       </div>
     </ScrollShadow>
   );
 }
-
-
-
-
 
 // export default function FollowLayout({
 //   children,

@@ -25,7 +25,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleUser = async () => {
-    const user = await getCurrentUser();
+    const user = (await getCurrentUser()) as IUser;
 
     setUser(user);
     setIsLoading(false);

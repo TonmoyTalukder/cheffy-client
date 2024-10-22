@@ -1,10 +1,19 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
+import React, { useEffect } from "react";
+import {
+  Button,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@nextui-org/react";
 import Link from "next/link";
 import { FieldValues, SubmitHandler } from "react-hook-form";
-import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+// import { toast } from "sonner";
 
 import CFInput from "@/src/components/form/CFInput";
 import CFForm from "@/src/components/form/CFForm";
@@ -17,11 +26,38 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const redirect = searchParams.get("redirect");
+  const status = searchParams.get("status");
+  const { isOpen: isBlockedModalOpen, onOpen, onClose } = useDisclosure();
+
+  // useEffect(() => {
+  //   if (isPending) {
+  //     toast("Logging..."); // Display toast notification when pending
+  //   }
+  //   if (isSuccess) {
+  //     toast.dismiss(); // Dismiss toast when success
+  //   }
+  // }, [isPending, isSuccess]);
+
+  useEffect(() => {
+    if (status === "blocked") {
+      onOpen();
+    }
+  }, [status, onOpen]);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     handleUserLogin(data);
     userLoading(true);
-    // console.log("Logging Data => ", data);
+
+    // , {
+    //   onError: (err) => {
+    //     if (
+    //       err?.message ===
+    //       "Error: AxiosError: Request failed with status code 403"
+    //     ) {
+    //       onOpen();
+    //     }
+    //   },
+    // }
   };
 
   useEffect(() => {
@@ -32,7 +68,7 @@ export default function LoginPage() {
         router.push("/");
       }
     }
-  }, [isPending, isSuccess]);
+  }, [isPending, isSuccess, redirect, router]);
 
   return (
     <div className="w-full">
@@ -40,17 +76,13 @@ export default function LoginPage() {
         <h3 className="my-2 text-2xl font-bold">Login</h3>
         <p className="mb-4">Welcome Back! Let&lsquo;s Get Started</p>
         <div className="w-[75%] md:w-[55%] lg:w-[35%]">
-          <CFForm
-            // resolver={zodResolver(loginValidationSchema)}
-            onSubmit={onSubmit}
-          >
+          <CFForm onSubmit={onSubmit}>
             <div className="py-3">
               <CFInput label="Email" name="email" type="email" />
             </div>
             <div className="py-3">
               <CFInput label="Password" name="password" type="password" />
             </div>
-
             <Button
               className="my-3 w-full rounded-md bg-default-900 font-semibold text-default"
               size="lg"
@@ -60,16 +92,62 @@ export default function LoginPage() {
             </Button>
           </CFForm>
           <div className="text-center">
-            Don&lsquo;t have account ?&nbsp;
             <Link
               className="text-[#daa611] hover:text-[#a58a40] underline"
-              href={"/signup"}
+              href={"/forget-password"}
             >
-              Sign Up
+              Forgot Password?
             </Link>
+            <div className="my-4">
+              Don&lsquo;t have an account?&nbsp;
+              <Link
+                className="text-[#daa611] hover:text-[#a58a40] underline"
+                href={"/signup"}
+              >
+                Sign Up
+              </Link>
+            </div>
+
+            <div className="my-4 gap-2 flex flex-row items-center justify-center">
+              <Link
+                className="text-[#daa611] hover:text-[#a58a40] underline"
+                href={"/about-us"}
+              >
+                About Us
+              </Link>
+              <Link
+                className="text-[#daa611] hover:text-[#a58a40] underline"
+                href={"/contact-us"}
+              >
+                Contact Us
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+
+      <Modal backdrop="blur" isOpen={isBlockedModalOpen} onClose={onClose}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                You are blocked
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  Your account has been blocked. Please contact support for
+                  assistance.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

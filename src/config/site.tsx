@@ -31,8 +31,20 @@ export const siteConfig = {
       href: "/premium-recipes",
     },
     {
+      label: <FaUserFriends style={{ fontSize: "30", marginTop: "4" }} />,
+      href: `/follow`,
+    },
+    {
       label: "Profile",
       href: `/profile`,
+    },
+    {
+      label: "About Us",
+      href: `/about-us`,
+    },
+    {
+      label: "Contact Us",
+      href: `/contact-us`,
     },
     // {
     //   label: "Logout",

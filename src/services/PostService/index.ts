@@ -147,6 +147,25 @@ export const updateRecipe = async (
   }
 };
 
+export const reportRecipe = async (recipeId: string): Promise<IRecipe> => {
+  try {
+    const { data } = await axiosInstance.put<IRecipe>(
+      `/recipes/${recipeId}/report`,
+    );
+
+    return data; // Return the updated recipe data, which will include the updated report count
+  } catch (error: any) {
+    console.error(
+      "Error reporting recipe:",
+      error.response?.data || error.message,
+    );
+    throw new Error(
+      error.response?.data?.message ||
+        "Failed to report recipe. Please try again.",
+    );
+  }
+};
+
 // // Fetch personalized feed of ranked recipes
 // export const getFeedRecipes = async (userId: string) => {
 //   try {

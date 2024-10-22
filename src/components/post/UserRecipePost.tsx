@@ -20,7 +20,7 @@ import { FaShareFromSquare } from "react-icons/fa6";
 import { PiSealCheckFill } from "react-icons/pi";
 import { FaRegEdit } from "react-icons/fa";
 import { IoDocumentLockOutline } from "react-icons/io5";
-import { MdDeleteForever, MdOutlineReportProblem } from "react-icons/md";
+import { MdDeleteForever } from "react-icons/md";
 import { Link } from "@nextui-org/react";
 
 import { useUser } from "@/src/context/user.provider";
@@ -36,10 +36,11 @@ import {
   IRating,
   IVote,
 } from "@/src/types";
+import { useGetSingleUser } from "@/src/hooks/user.hooks";
+
+import PremiumModal from "../modal/PremiumModal";
 
 import UpdateRecipeForm from "./UpdateRecipeForm";
-import PremiumModal from "../modal/PremiumModal";
-import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
 export interface IAuthor {
   _id: string;
@@ -68,6 +69,7 @@ export interface RecipeInterface {
   premium: boolean;
   comments: IComment[];
   diet: string;
+  report: number;
 }
 
 interface UserRecipePostProps {
@@ -258,7 +260,7 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
               </div>
             </Link>
             {/* Place the button outside of the link */}
-            {recipeOwner ? (
+            {recipeOwner && (
               <Button
                 startContent={
                   <MdDeleteForever className="text-red-500" size={24} />
@@ -266,16 +268,6 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
                 size="sm"
                 variant="flat"
                 onPress={() => handleDelete(recipe._id, recipe.title)}
-              />
-            ) : (
-              <Button
-                startContent={
-                  <MdOutlineReportProblem className="text-red-500" size={24} />
-                }
-                size="sm"
-                variant="flat"
-                // onPress={() => handleDelete(recipe._id, recipe.title)}
-                className="ml-auto"
               />
             )}
           </CardHeader>

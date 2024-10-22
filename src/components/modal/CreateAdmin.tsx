@@ -17,89 +17,82 @@ import CFAsyncSelect from "@/src/components/form/CFAsyncSelect";
 import { fetchCities } from "@/src/components/UI/fetchCities";
 import { uploadImageFile } from "@/src/utils/uploadImage";
 
-// Reuse the image upload function from the signup component
-// const uploadImageFile = async (file: File): Promise<string | null> => {
-//   // Similar image upload logic as in SignUpPage
-//   try {
-//     const imgData = new FormData();
-
-//     imgData.append("photo", file);
-//     const response = await fetch(
-//       `https://cheffy-server.vercel.app/api/image-upload/`,
-//       {
-//         method: "POST",
-//         body: imgData,
-//       },
-//     );
-
-//     // Log the response for debugging
-//     console.log("Response Status:", response.status);
-
-//     if (!response.ok) {
-//       throw new Error("Image upload failed with status " + response.status);
-//     }
-
-//     const data = await response.json();
-
-//     return data.data.path || data.data.url;
-//   } catch (error) {
-//     console.error("Error uploading image:", error);
-
-//     return "";
-//   }
-// };
-
-interface IEditProfileModalProps {
+interface ICreateAdminModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userData: IUser;
-  onUpdate: (updatedData: IUser) => void;
+  onCreate: (newAdmin: IUser) => void;
 }
 
-const EditProfileModal = ({
+const CreateAdminModal = ({
   isOpen,
   onClose,
-  userData,
-  onUpdate,
-}: IEditProfileModalProps) => {
-  const [updatedData, setUpdatedData] = useState<IUser>(userData);
+  onCreate,
+}: ICreateAdminModalProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    userData.displayPicture || null,
-  );
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
-    userData.coverPicture || null,
+    null,
   );
 
   const [inputTopic, setInputTopic] = useState<string>("");
-  const [topics, setTopics] = useState<string[]>(userData.topics || []);
+  const [topics, setTopics] = useState<string[]>([]);
 
   const methods = useForm({
     defaultValues: {
-      city: updatedData.city || "", // Set city default value
+      name: "",
+      email: "",
+      phone: "",
+      city: "",
+      foodHabit: "",
+      sex: "",
+      bio: "",
     },
-  }); // Initialize form methods
+  });
 
   const handleClose = () => {
-    setUpdatedData(userData); // Reset the form data to original user data
+    methods.reset(); // Reset form data
     setImageFile(null); // Reset the image file
     setCoverImageFile(null); // Reset the cover image file
-    setImagePreview(userData.displayPicture || null); // Reset the image preview
-    setCoverImagePreview(userData.coverPicture || null); // Reset the image preview
-    setTopics(userData.topics || []); // Reset the topics
-    onClose(); // Call the provided onClose function
+    setImagePreview(null); // Reset the image preview
+    setCoverImagePreview(null); // Reset the cover image preview
+    setTopics([]); // Reset the topics
+    onClose(); // Close the modal
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
+  const onSubmit = async (data: any) => {
+    console.log("Form Submitted", data); // Log form data
+    let uploadedDisplayPictureUrl = imagePreview;
+    let uploadedCoverPictureUrl = coverImagePreview;
 
-  // Handle form inputs
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    if (imageFile) {
+      uploadedDisplayPictureUrl = await uploadImageFile(imageFile);
+      if (!uploadedDisplayPictureUrl) {
+        alert("Display image upload failed");
 
-    setUpdatedData((prevData) => ({ ...prevData, [name]: value }));
+        return;
+      }
+    }
+
+    if (coverImageFile) {
+      uploadedCoverPictureUrl = await uploadImageFile(coverImageFile);
+      if (!uploadedCoverPictureUrl) {
+        alert("Cover image upload failed");
+
+        return;
+      }
+    }
+
+    const finalData: IUser = {
+      ...data,
+      displayPicture: uploadedDisplayPictureUrl || "",
+      coverPicture: uploadedCoverPictureUrl || "",
+      topics,
+    };
+
+    console.log("Final Data => ", finalData); // Log final admin data
+    onCreate(finalData);
+    handleClose();
   };
 
   // Handle image changes
@@ -115,13 +108,11 @@ const EditProfileModal = ({
     }
   };
 
-  // Clear image input
   const clearImage = () => {
     setImageFile(null);
     setImagePreview(null);
   };
 
-  // Handle cover image changes
   const handleCoverImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -134,7 +125,6 @@ const EditProfileModal = ({
     }
   };
 
-  // Clear cover image input
   const clearCoverImage = () => {
     setCoverImageFile(null);
     setCoverImagePreview(null);
@@ -157,40 +147,9 @@ const EditProfileModal = ({
     setTopics(topics.filter((topic) => topic !== topicToRemove));
   };
 
-  const handleUpdate = async () => {
-    let uploadedDisplayPictureUrl = imagePreview;
-    let uploadedCoverPictureUrl = coverImagePreview;
-
-    if (imageFile) {
-      uploadedDisplayPictureUrl = await uploadImageFile(imageFile);
-      if (!uploadedDisplayPictureUrl) {
-        alert("Display image upload failed");
-
-        return;
-      }
-    }
-
-    if (coverImageFile) {
-      uploadedCoverPictureUrl = await uploadImageFile(coverImageFile);
-      if (!uploadedCoverPictureUrl) {
-        alert("Cover image upload failed");
-
-        return;
-      }
-    }
-
-    const finalData = {
-      ...updatedData,
-      displayPicture: uploadedDisplayPictureUrl || "",
-      coverPicture: uploadedCoverPictureUrl || "",
-      topics,
-    };
-
-    onUpdate(finalData);
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-    handleClose();
+  // Wrap submit with type compatibility for PressEvent
+  const handlePressSubmit = () => {
+    methods.handleSubmit(onSubmit)();
   };
 
   return (
@@ -203,7 +162,7 @@ const EditProfileModal = ({
       <ModalContent>
         <>
           <ModalHeader className="flex flex-col gap-1">
-            Edit Profile
+            Create New User
           </ModalHeader>
           <ModalBody>
             <FormProvider {...methods}>
@@ -219,10 +178,9 @@ const EditProfileModal = ({
                   <input
                     className="w-full p-2 border rounded-md"
                     id="name"
-                    name="name"
                     type="text"
-                    value={updatedData.name}
-                    onChange={handleInputChange}
+                    {...methods.register("name", { required: true })}
+                    placeholder="Enter name"
                   />
                 </div>
 
@@ -234,10 +192,9 @@ const EditProfileModal = ({
                   <input
                     className="w-full p-2 border rounded-md"
                     id="email"
-                    name="email"
                     type="email"
-                    value={updatedData.email}
-                    onChange={handleInputChange}
+                    {...methods.register("email", { required: true })}
+                    placeholder="Enter email"
                   />
                 </div>
 
@@ -249,31 +206,21 @@ const EditProfileModal = ({
                   <input
                     className="w-full p-2 border rounded-md"
                     id="phone"
-                    name="phone"
                     type="text"
-                    value={updatedData.phone}
-                    onChange={handleInputChange}
+                    {...methods.register("phone", { required: true })}
+                    placeholder="Enter phone number"
                   />
                 </div>
 
                 {/* City */}
                 <div>
-                  {/* <label className="block font-medium" htmlFor="city">
-                      City
-                    </label> */}
-
                   <CFAsyncSelect
                     label="City"
-                    loadOptions={fetchCities} // Your function to load city options
+                    loadOptions={fetchCities}
                     name="city"
                     placeholder="Type your city"
-                    //   onChange={(e) => console.log("Selected city: ", e)}
                     onChange={(selectedCity) => {
-                      // Update the city in the form state
-                      setUpdatedData((prevData) => ({
-                        ...prevData,
-                        city: selectedCity, // selectedCity will be the string value
-                      }));
+                      methods.setValue("city", selectedCity);
                     }}
                   />
                 </div>
@@ -286,11 +233,9 @@ const EditProfileModal = ({
                   <select
                     className="w-full p-2 border rounded-md"
                     id="foodHabit"
-                    name="foodHabit"
-                    value={updatedData.foodHabit}
-                    onChange={() => handleInputChange}
+                    {...methods.register("foodHabit")}
                   >
-                    <option value="">Select Food Habit</option>
+                    <option value="">Select food habit</option>
                     <option value="veg">Vegetarian</option>
                     <option value="non_veg">Non-Vegetarian</option>
                     <option value="vegan">Vegan</option>
@@ -305,11 +250,9 @@ const EditProfileModal = ({
                   <select
                     className="w-full p-2 border rounded-md"
                     id="sex"
-                    name="sex"
-                    value={updatedData.sex}
-                    onChange={() => handleInputChange}
+                    {...methods.register("sex")}
                   >
-                    <option value="">Select Gender</option>
+                    <option value="">Select gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
@@ -323,10 +266,9 @@ const EditProfileModal = ({
                   <input
                     className="w-full p-2 border rounded-md"
                     id="bio"
-                    name="bio"
                     type="text"
-                    value={updatedData.bio || ""}
-                    onChange={handleInputChange}
+                    {...methods.register("bio")}
+                    placeholder="Enter bio"
                   />
                 </div>
 
@@ -375,7 +317,7 @@ const EditProfileModal = ({
                   />
                   {coverImagePreview && (
                     <div className="relative my-5 flex justify-center">
-                      <div className="relative rounded-xl border-2 border-dashed border-default-300 p-2">
+                      <div className="relative size-48 rounded-xl border-2 border-dashed border-default-300 p-2">
                         <img
                           alt="cover"
                           className="h-full w-full object-cover object-center rounded-md"
@@ -397,45 +339,43 @@ const EditProfileModal = ({
                   <label className="block font-medium" htmlFor="topics">
                     Topics
                   </label>
-                  <Input
-                    label="Topics"
-                    placeholder="Enter a topic and press enter"
+                  <input
+                    className="w-full p-2 border rounded-md"
+                    id="topics"
+                    type="text"
                     value={inputTopic}
                     onChange={handleTopicInputChange}
-                    onKeyDown={handleTopicKeyPress}
+                    onKeyPress={handleTopicKeyPress}
+                    placeholder="Add a topic and press enter"
                   />
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {topics.map((topic) => (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {topics.map((topic, index) => (
                       <div
-                        key={topic}
-                        className="flex items-center gap-1 bg-gray-200 px-2 py-1 rounded-full"
+                        key={index}
+                        className="flex items-center gap-2 border p-2 rounded-md"
                       >
-                        <span className="text-black">{topic}</span>
-                        <FiX
-                          className="cursor-pointer text-red-500"
+                        <span>{topic}</span>
+                        <button
+                          className="text-red-500"
                           onClick={() => removeTopic(topic)}
-                        />
+                        >
+                          <FiX />
+                        </button>
                       </div>
                     ))}
                   </div>
                 </div>
+
+                {/* Submit Button */}
+                <Button color="primary" onPress={handlePressSubmit}>
+                  Create User
+                </Button>
               </form>
             </FormProvider>
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="light" onPress={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              onPress={() => {
-                handleUpdate();
-                // setTimeout(() => {
-                //   window.location.reload(); // Reload the window
-                // }, 1000);
-              }}
-            >
-              Save Changes
+            <Button variant="light" color="danger" onPress={handleClose}>
+              Close
             </Button>
           </ModalFooter>
         </>
@@ -444,4 +384,4 @@ const EditProfileModal = ({
   );
 };
 
-export default EditProfileModal;
+export default CreateAdminModal;

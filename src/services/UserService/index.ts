@@ -7,6 +7,20 @@ import { jwtDecode } from "jwt-decode";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 
+export const getAllUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get(`/users/`);
+
+    if (data.success) {
+      console.log("users data => ", data);
+    }
+
+    return data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
 export const getSingleUser = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`/users/${id}`);
@@ -40,6 +54,7 @@ export const updateUser = async (id: string, userData: FieldValues) => {
           ...userData, // Merge the updated user fields from userData
         };
 
+        cookies().delete("accessToken");
         cookies().set("accessToken", currentAccessToken);
 
         return updatedUser;
@@ -64,6 +79,20 @@ export const updateUser = async (id: string, userData: FieldValues) => {
     return data;
   } catch (error: any) {
     throw new Error(error);
+  }
+};
+
+export const reportUser = async (userId: string) => {
+  try {
+    const { data } = await axiosInstance.put(`/users/${userId}/report`);
+
+    if (data.success) {
+      return data;
+    }
+
+    throw new Error(data.message || "Failed to report user.");
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message);
   }
 };
 

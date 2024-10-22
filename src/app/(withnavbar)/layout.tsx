@@ -8,6 +8,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         style={{
           overflowX: "hidden",
         }}
+        className="mt-5 sm:mt-0 mx-1 sm:mx-0"
       >
         {children}
       </main>

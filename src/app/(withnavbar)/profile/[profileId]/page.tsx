@@ -14,13 +14,6 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import Image from "next/image";
-import {
-  FaPhone,
-  FaCity,
-  FaGenderless,
-  FaUtensils,
-  FaEnvelope,
-} from "react-icons/fa";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
@@ -28,18 +21,25 @@ import { PiSealCheckFill } from "react-icons/pi";
 import Link from "next/link";
 import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import {
+  MdOutlineAdminPanelSettings,
+  MdOutlineReportProblem,
+} from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 import { IUser, TFollowUser } from "@/src/types";
 import {
   useFollowUser,
   useGetSingleUser,
   usePremiumPayment,
+  useReportUser,
   useUpdateUser,
 } from "@/src/hooks/user.hooks";
 import EditProfileModal from "@/src/components/modal/EditProfileModal";
 import envConfig from "@/src/config/envConfig";
 import RecipePostForm from "@/src/components/post/RecipePostForm";
 import UserRecipePost from "@/src/components/post/UserRecipePost";
+import About from "@/src/components/profile/About";
 
 interface IProps {
   params: {
@@ -53,7 +53,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     // mutate: initiatePayment,
     isPending: premiumPayPending,
   } = usePremiumPayment(profileId);
+  const reportUserMutation = useReportUser();
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const router = useRouter();
+
+  const navigateTo = (path: string) => {
+    router.push(path);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined" && !sessionStorage.getItem("reloaded")) {
@@ -71,6 +78,12 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const [followsYou, setFollowsYou] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role === "ADMIN") {
+      setActiveTab("about");
+    }
+  }, [user]);
 
   // Fetch data for the current visitor
   const [touristId, setTouristId] = useState<string | null>(null);
@@ -195,6 +208,13 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     handleFollowUser(targetUserId);
   };
 
+  const handleReport = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to report "${name}"?`)) {
+      reportUserMutation.mutate(id);
+      console.log("Reported id = ", id);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="flex flex-col justify-center items-center">
@@ -240,12 +260,13 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               src={user.displayPicture}
             />
             <div className="ml-4 mt-2">
-              <div className="flex">
+              <div className="flex flex-row">
                 <h1 className="text-3xl font-semibold">{user.name}</h1>{" "}
                 {user.isPremium && <PiSealCheckFill />}
+                {user.role === "ADMIN" && <MdOutlineAdminPanelSettings />}
                 {isOwner && (
                   <>
-                    {!user.isPremium && (
+                    {!user.isPremium && user.role === "USER" && (
                       <Button
                         className="ml-2"
                         size="md"
@@ -271,19 +292,48 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   </>
                 )}
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <span className="text-gray-500 font-medium">
-                  {user.followers!.length} Followers
-                </span>
-                <span className="text-gray-500 font-medium">
-                  {user.following!.length} Following
-                </span>
-                {followsYou && (
-                  <span className="text-green-500 font-medium">
-                    Follows you
+              {user.role === "USER" && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 mt-2">
+                  <span className="text-gray-500 font-medium">
+                    {user.followers!.length} Followers
                   </span>
-                )}
-              </div>
+                  <span className="text-gray-500 font-medium">
+                    {user.following!.length} Following
+                  </span>
+                  {followsYou && (
+                    <span className="text-green-500 font-medium">
+                      Follows you
+                    </span>
+                  )}
+
+                  {/* <Button
+                    startContent={
+                      <MdOutlineReportProblem
+                        className="text-red-500"
+                        size={18}
+                      />
+                    }
+                    size="sm"
+                    variant="flat"
+                    onPress={() => handleReport(user._id!, user.name)}
+                    className="ml-2"
+                  /> */}
+
+                  {!isOwner && (
+                    <span
+                      role="button"
+                      className="flex flex-row items-center gap-1 hover:text-red-500"
+                      onClick={() => handleReport(user._id!, user.name)}
+                    >
+                      <MdOutlineReportProblem
+                        className="text-red-500"
+                        size={18}
+                      />{" "}
+                      Report
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -333,7 +383,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
       </div>
 
       {/* Intro Section */}
-      <div className="block md:hidden lg:hidden xl:hidden p-6 rounded-lg shadow-lg sm:w-full max-h-fit">
+      <div className="block lg:hidden xl:hidden p-6 rounded-lg shadow-lg sm:w-full max-h-fit">
         <h3 className="text-xl font-semibold">Intro</h3>
         <p className="text-gray-500 mt-2">{user.bio}</p>
         <div className="mt-4 text-left">
@@ -341,7 +391,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             <strong>City:</strong> {user.city}
           </p>
           <p>
-            <strong>Food Habit:</strong> {user.foodHabit}
+            <strong>Food Habit:</strong>{" "}
+            {user.foodHabit === "vegan" ? (
+              <span>Vegan</span>
+            ) : user.foodHabit === "veg" ? (
+              <span>Vegan</span>
+            ) : (
+              <span>Non Veg</span>
+            )}
           </p>
           <p>
             <strong>Topics:</strong> {user.topics?.join(", ")}
@@ -359,40 +416,61 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
       {/* Tab Menu */}
       <div className="p-3">
-        <div className="flex justify-around space-x-4 text-lg font-semibold">
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "about" ? "border-b-4 border-blue-500" : ""
-            }`}
-            onClick={() => setActiveTab("about")}
-          >
-            About
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "posts" ? "border-b-4 border-blue-500" : ""
-            }`}
-            onClick={() => setActiveTab("posts")}
-          >
-            Posts
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "followers" ? "border-b-4 border-blue-500" : ""
-            }`}
-            onClick={() => setActiveTab("followers")}
-          >
-            Followers
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "following" ? "border-b-4 border-blue-500" : ""
-            }`}
-            onClick={() => setActiveTab("following")}
-          >
-            Following
-          </button>
-        </div>
+        {user.role === "USER" ? (
+          <div className="flex justify-around space-x-4 text-lg font-semibold overflow-x-auto">
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "about" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => setActiveTab("about")}
+            >
+              About
+            </button>
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "posts" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => setActiveTab("posts")}
+            >
+              Posts
+            </button>
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "followers" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => setActiveTab("followers")}
+            >
+              Followers
+            </button>
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "following" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => setActiveTab("following")}
+            >
+              Following
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-around space-x-4 text-lg font-semibold overflow-x-auto">
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "about" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => setActiveTab("about")}
+            >
+              About
+            </button>
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "posts" ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => navigateTo(`/admin-dashboard`)}
+            >
+              Admin Dashboard
+            </button>
+          </div>
+        )}
       </div>
 
       <div>
@@ -401,7 +479,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
           {activeTab === "posts" && (
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Intro Section */}
-              <div className="hidden md:block lg:block xl:block p-6 rounded-lg shadow-lg w-1/3  max-h-fit">
+              <div className="hidden lg:block xl:block p-6 rounded-lg shadow-lg w-1/3  max-h-fit">
                 <h3 className="text-xl font-semibold">Intro</h3>
                 <p className="text-gray-500 mt-2">{user.bio}</p>
                 <div className="mt-4 text-left">
@@ -409,7 +487,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     <strong>City:</strong> {user.city}
                   </p>
                   <p>
-                    <strong>Food Habit:</strong> {user.foodHabit}
+                    <strong>Food Habit:</strong>{" "}
+                    {user.foodHabit === "vegan" ? (
+                      <span>Vegan</span>
+                    ) : user.foodHabit === "veg" ? (
+                      <span>Vegan</span>
+                    ) : (
+                      <span>Non Veg</span>
+                    )}
                   </p>
                   <p>
                     <strong>Topics:</strong> {user.topics?.join(", ")}
@@ -473,7 +558,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               {user.followers?.length === 0 ? (
                 <p className="text-gray-500 mt-2">No followers yet.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full mb-3">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-1 lg:w-6/12 xl:w-6/12 md:w-7/12 mb-3 mx-auto">
                   {user.followers?.map((follower, index) => (
                     <div
                       key={index}
@@ -539,7 +624,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
               {user.following?.length === 0 ? (
                 <p className="text-gray-500 mt-2">Not following anyone yet.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-1 w-full mb-3">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-1 lg:w-6/12 xl:w-6/12 md:w-7/12 mb-3 mx-auto">
                   {user.following?.map((follow, index) => (
                     <div
                       key={index}
@@ -601,8 +686,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
           {activeTab === "about" && (
             <div className="p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold">Details</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-left">
+              {/* <h3 className="text-xl font-semibold">Details</h3> */}
+              <About profileId={profileId} />
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-left">
                 <p>
                   <FaEnvelope className="inline mr-2" />
                   <strong>Email:</strong> {user.email}
@@ -617,7 +703,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                 </p>
                 <p>
                   <FaUtensils className="inline mr-2" />
-                  <strong>Food Habit:</strong> {user.foodHabit}
+                  <strong>Food Habit:</strong>{" "}
+                  {user.foodHabit === "vegan" ? (
+                    <span>Vegan</span>
+                  ) : user.foodHabit === "veg" ? (
+                    <span>Vegan</span>
+                  ) : (
+                    <span>Non Veg</span>
+                  )}
                 </p>
                 <p>
                   <FaGenderless className="inline mr-2" />
@@ -626,7 +719,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                 <p>
                   <strong>Topics:</strong> {user.topics?.join(", ")}
                 </p>
-              </div>
+              </div> */}
             </div>
           )}
         </div>

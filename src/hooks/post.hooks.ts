@@ -18,6 +18,7 @@ import {
   getSingleRecipe,
   postComment,
   rateRecipe,
+  reportRecipe,
   updateComment,
   updateRecipe,
   voteRecipe,
@@ -220,6 +221,34 @@ export const useUpdateRecipe = () => {
         error.message || "An error occurred while updating the recipe.",
       ); // Show error toast
       console.error("Error updating recipe:", error); // Log the error
+    },
+  });
+};
+
+// Report Recipe Hook
+export const useReportRecipe = () => {
+  const queryClient = useQueryClient(); // Access react-query's cache
+
+  return useMutation({
+    mutationKey: ["RECIPE_REPORT"], // Unique key for this mutation
+    mutationFn: async (recipeId: string) => {
+      console.log(`Reporting recipe with id: ${recipeId}`);
+      const response = await reportRecipe(recipeId); // Call the service function to report the recipe
+
+      return response; // Return the updated recipe data
+    },
+    onSuccess: (data) => {
+      toast.success("Recipe reported successfully!"); // Show success toast
+      queryClient.invalidateQueries({ queryKey: ["FETCH_FEED_RECIPES"] }); // Invalidate recipe list to refetch
+      queryClient.invalidateQueries({
+        queryKey: ["GET_SINGLE_RECIPE", data._id],
+      }); // Invalidate the single recipe query to refetch the reported recipe
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.message || "An error occurred while reporting the recipe.",
+      ); // Show error toast
+      console.error("Error reporting recipe:", error); // Log the error
     },
   });
 };
