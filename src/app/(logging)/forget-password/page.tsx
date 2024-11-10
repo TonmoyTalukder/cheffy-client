@@ -13,6 +13,7 @@ export default function ForgetPasswordPage() {
   const [emailSent, setEmailSent] = useState(false);
 
   const onSubmit = (data: { email: string }) => {
+    console.log("Forget Email ", data);
     forgetPassword(data, {
       onSuccess: () => setEmailSent(true),
     });

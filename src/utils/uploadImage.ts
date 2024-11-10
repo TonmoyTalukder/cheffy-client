@@ -16,7 +16,7 @@ export const uploadImageFile = async (file: File): Promise<string | null> => {
       const errorData = await response.text();
 
       console.error("Server Error Response:", errorData);
-      throw new Error("Image upload failed with status " + response.status);
+      // throw new Error("Image upload failed with status " + response.status);
     }
 
     const data = await response.json();

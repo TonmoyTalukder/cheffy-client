@@ -144,6 +144,7 @@ export const useVoteRecipe = () => {
       // toast.success("Vote updated successfully!");
       // Optionally refetch the recipes or the single recipe to update the UI
       queryClient.invalidateQueries({ queryKey: ["FETCH_RECIPES"] });
+      queryClient.invalidateQueries({ queryKey: ["FETCH_FEED_RECIPES"] });
       queryClient.invalidateQueries({ queryKey: ["GET_SINGLE_RECIPE"] });
     },
     onError: (error: any) => {

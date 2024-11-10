@@ -9,7 +9,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "www.bayarea.com", // Add the specific domain here
+        hostname: "www.bayarea.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co.com",
       },
     ],
   },

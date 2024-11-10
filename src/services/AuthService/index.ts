@@ -17,8 +17,8 @@ export const registerUser = async (userData: FieldValues) => {
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
     console.log("error: ", error);
+    throw new Error(error);
   }
 };
 export const loginUser = async (userData: FieldValues) => {
@@ -34,7 +34,7 @@ export const loginUser = async (userData: FieldValues) => {
 
     return data;
   } catch (error: any) {
-    // console.log(error.status);
+    console.log(error);
     throw new Error(error);
   }
 };
@@ -49,14 +49,14 @@ export const forgetPassword = async (email: string) => {
   } catch (error: any) {
     throw new Error(
       error.response?.data?.error ||
-        "An error occurred during password recovery.",
+      "An error occurred during password recovery.",
     );
   }
 };
 
 export const resetPassword = async (token: string, newPassword: string) => {
   try {
-    const { data } = await axiosInstance.post("/auth/reset-password", {
+    const { data } = await axiosInstance.post(`/auth/reset-password/${token}`, {
       token,
       newPassword,
     });

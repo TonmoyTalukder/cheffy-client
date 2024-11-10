@@ -1,3 +1,4 @@
+// navbar.tsx
 /* eslint-disable no-console */
 "use client";
 import {
@@ -37,7 +38,7 @@ export const Navbar = () => {
   const usersData = usersFetchedData?.data || [];
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const avatarUrl =
@@ -62,13 +63,11 @@ export const Navbar = () => {
         href: profileId ? `/profile/${profileId}` : "/login",
       };
     }
-
     return item;
   });
 
-  const handleSearchChange = (e: { target: { value: string } }) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.toLowerCase();
-
     setSearchTerm(searchTerm);
 
     if (searchTerm.length > 0) {
@@ -77,39 +76,32 @@ export const Navbar = () => {
           user.name.toLowerCase().includes(searchTerm) ||
           user.email.toLowerCase().includes(searchTerm),
       );
-
       setFilteredUsers(filtered.slice(0, 3)); // Limit to top 3 users
       setShowSuggestions(true);
     } else {
       setFilteredUsers([]);
       setShowSuggestions(false);
-      setSearchTerm("");
     }
   };
 
-  // Hide suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       setShowSuggestions(false);
       setSearchTerm("");
     };
-
     document.addEventListener("click", handleClickOutside);
-
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
-  // Handle profile or search redirection
   const handleUserClick = (userId: string) => {
     router.push(`/profile/${userId}`);
-    setShowSuggestions(false); // Close the suggestion box
+    setShowSuggestions(false);
   };
 
   const handleSearchClick = () => {
     const formattedSearchTerm = searchTerm.trim().replace(/\s+/g, "+");
-
     router.push(`/search?searchText=${formattedSearchTerm}`);
     setShowSuggestions(false);
     setSearchTerm("");
@@ -120,35 +112,30 @@ export const Navbar = () => {
       <NextUINavbar
         style={{
           position: "fixed",
+          top: 0,
+          width: "100%",
+          zIndex: 1000,
+          borderBottom: "1px solid var(--nextui-colors-border)",
+          backgroundColor: "var(--nextui-colors-background)",
         }}
         isBordered
         maxWidth="xl"
-        position="sticky"
       >
-        <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-          <NavbarBrand as="li" className="gap-3 max-w-fit">
-            <NextLink
-              className="flex justify-start items-center gap-1"
-              href="/"
-            >
+        <NavbarContent className="flex flex-row" justify="start">
+          <NavbarBrand className="flex items-left gap-0">
+            <NextLink href="/" className="flex items-center gap-2">
               <Logo />
               <p className="font-bold text-inherit">Cheffy</p>
             </NextLink>
           </NavbarBrand>
-        </NavbarContent>
-
-        <NavbarContent
-          as="div"
-          className="items-center ml-7 lg:min-w-60 md:min-w-50 sm:min-w-50"
-          justify="center"
-        >
           <Input
             classNames={{
-              base: "w-full h-10",
-              mainWrapper: "h-full",
+              base: "w-auto h-10",
+              inputWrapper: "h-full bg-default-400/20 dark:bg-default-500/20",
               input: "text-small",
-              inputWrapper:
-                "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+            }}
+            style={{
+              marginRight: '3rem'
             }}
             placeholder="Type to search..."
             size="md"
@@ -156,36 +143,35 @@ export const Navbar = () => {
             type="search"
             value={searchTerm}
             onChange={handleSearchChange}
-            onClick={(e) => e.stopPropagation()} // Prevent hiding when clicking on input
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Search"
           />
         </NavbarContent>
 
         {user?.role === "USER" && (
-          <NavbarContent className="basis-1/5 sm:basis-full" justify="center">
-            <ul className="hidden xl:flex lg:flex md:flex gap-10 justify-start ml-2">
-              {siteConfig.navItems.map((item) => (
-                <NavbarItem key={item.href}>
-                  <NextLink
-                    className={clsx(
-                      linkStyles({ color: "foreground" }),
-                      pathname === item.href
-                        ? "text-indigo-500 font-medium"
-                        : "data-[active=true]:text-indigo-500 data-[active=true]:font-medium",
-                    )}
-                    href={item.href}
-                  >
-                    {item.label}
-                  </NextLink>
-                </NavbarItem>
-              ))}
-            </ul>
+          <NavbarContent
+            className="hidden xl:flex lg:flex md:flex flex-1 justify-center"
+            justify="center"
+          >
+            {siteConfig.navItems.map((item) => (
+              <NavbarItem key={item.href}>
+                <NextLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    pathname === item.href
+                      ? "text-indigo-500 font-medium"
+                      : "hover:text-indigo-500"
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+              </NavbarItem>
+            ))}
           </NavbarContent>
         )}
 
-        <NavbarContent
-          className="hidden sm:flex basis-1/5 sm:basis-full"
-          justify="end"
-        >
+        <NavbarContent className="flex-1 justify-end" justify="end">
           <NavbarItem className="hidden sm:flex gap-2">
             <ThemeSwitch />
             <Link href={`/profile/${profileId}`}>
@@ -194,19 +180,12 @@ export const Navbar = () => {
           </NavbarItem>
           <NavbarItem
             key="logout"
-            className="text-danger"
-            onClick={() => handleLogout()}
+            className="text-danger cursor-pointer"
+            onClick={handleLogout}
           >
             <AiOutlineLogout size={25} />
           </NavbarItem>
-        </NavbarContent>
-
-        <NavbarContent
-          className="sm:hidden md:hidden basis-1 pl-4"
-          justify="end"
-        >
-          <ThemeSwitch />
-          <NavbarMenuToggle />
+          <NavbarMenuToggle className="sm:hidden md:hidden" />
         </NavbarContent>
 
         <NavbarMenu>
@@ -215,12 +194,10 @@ export const Navbar = () => {
               <NavbarMenuItem key={`${item}-${index}`}>
                 <Link
                   className={clsx(
-                    linkStyles({
-                      color: "foreground",
-                    }),
+                    linkStyles({ color: "foreground" }),
                     pathname === item.href
                       ? "text-indigo-500 font-medium"
-                      : "data-[active=true]:text-indigo-500 data-[active=true]:font-medium",
+                      : "hover:text-indigo-500"
                   )}
                   href={`${item.href}`}
                   size="lg"
@@ -229,12 +206,11 @@ export const Navbar = () => {
                 </Link>
               </NavbarMenuItem>
             ))}
-
             <NavbarMenuItem key="logout">
               <NavbarItem
-                key="delete"
-                className="text-danger"
-                onClick={() => handleLogout()}
+                key="logout"
+                className="text-danger cursor-pointer"
+                onClick={handleLogout}
               >
                 <AiOutlineLogout size={25} />
               </NavbarItem>
@@ -243,7 +219,6 @@ export const Navbar = () => {
         </NavbarMenu>
       </NextUINavbar>
 
-      {/* Search suggestions dropdown */}
       {showSuggestions && (
         <div
           className="absolute bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-600 rounded-lg w-full max-w-xl mt-2 px-4 py-3"
@@ -251,21 +226,18 @@ export const Navbar = () => {
             top: "72px",
             left: "50%",
             transform: "translateX(-50%)",
-            zIndex: "10000",
+            zIndex: 10000,
           }}
         >
           {filteredUsers.length > 0 && (
             <>
-              {filteredUsers.map((user: IUser) => (
+              {filteredUsers.map((user) => (
                 <div
                   key={user._id}
                   role="button"
                   tabIndex={0}
                   className="flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-                  onClick={() => {
-                    handleUserClick(user._id!);
-                    setSearchTerm("");
-                  }}
+                  onClick={() => handleUserClick(user._id!)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       handleUserClick(user._id!);
@@ -285,7 +257,6 @@ export const Navbar = () => {
               ))}
             </>
           )}
-          {/* Search option */}
           <div
             className="flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
             role="button"
@@ -293,7 +264,7 @@ export const Navbar = () => {
             onClick={handleSearchClick}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
-                handleSearchClick;
+                handleSearchClick();
               }
             }}
           >

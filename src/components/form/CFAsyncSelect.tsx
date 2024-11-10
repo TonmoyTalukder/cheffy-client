@@ -8,6 +8,7 @@ interface IProps extends IInput {
     inputValue: string,
   ) => Promise<{ value: string; label: string }[]>;
   placeholder?: string;
+  onInputChange?: (inputValue: string) => void;
   onChange?: (value: string) => void; // Pass value as a string
 }
 

@@ -16,56 +16,12 @@ import CFSelect from "@/src/components/form/CFSelect";
 import CFAsyncSelect from "@/src/components/form/CFAsyncSelect";
 import CFTextarea from "@/src/components/form/CFTextArea";
 import { fetchCities } from "@/src/components/UI/fetchCities";
-// import { useUser } from "@/src/context/user.provider";
+import { useUser } from "@/src/context/user.provider";
 import { useUserRegistration } from "@/src/hooks/auth.hooks";
 import { uploadImageFile } from "@/src/utils/uploadImage";
 
-// export const uploadImageFile = async (file: File): Promise<string | null> => {
-//   try {
-//     const imgData = new FormData();
-
-//     // Ensure the key matches what the backend expects
-//     imgData.append("photo", file);
-
-//     const response = await fetch(
-//       `https://cheffy-server.vercel.app/api/image-upload/`,
-//       {
-//         method: "POST",
-//         body: imgData,
-//         credentials: "include",
-//       },
-//     );
-
-//     // const response = await fetch(`${envConfig.baseApi}/image-upload/`, {
-//     //   method: "POST",
-//     //   body: imgData,
-//     //   credentials: 'include',
-//     // });
-
-//     if (!response.ok) {
-//       // Log the response in case of failure
-//       const errorData = await response.text();
-
-//       console.error("Server Error Response:", errorData);
-//       throw new Error("Image upload failed with status " + response.status);
-//     }
-
-//     // Log the success response to debug the returned data structure
-//     const data = await response.json();
-
-//     console.log("Upload success response:", data);
-
-//     // Check if the expected field exists
-//     return data.data.path || data.data.url; // Adjust based on actual API response
-//   } catch (error) {
-//     console.error("Error uploading image:", error);
-
-//     return "";
-//   }
-// };
-
 const SignUpPage: NextPage = () => {
-  // const { setIsLoading: userLoading } = useUser();
+  const { setIsLoading: userLoading } = useUser();
   const {
     mutate: handleUserSignUp,
     isPending,
@@ -80,6 +36,15 @@ const SignUpPage: NextPage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [topics, setTopics] = useState<string[]>([]);
   const [inputTopic, setInputTopic] = useState<string>("");
+  const [cityInputValue, setCityInputValue] = useState<string>("");
+  // const [isCityInputNotEmpty, setIsCityInputNotEmpty] =
+  //   useState<boolean>(false);
+  const [isNext, setIsNext] = useState<boolean>(false);
+
+  // useEffect(() => {
+  //   setIsCityInputNotEmpty(cityInputValue.length > 0);
+  // }, [cityInputValue]);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -127,13 +92,17 @@ const SignUpPage: NextPage = () => {
       console.log(uploadedImageUrl);
       if (!uploadedImageUrl) {
         alert("Image upload failed. Please try again.");
+        uploadedImageUrl =
+          "https://i.ibb.co.com/M5JS5qL/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black.png";
 
         return;
       }
     }
 
     const userData = {
-      displayPicture: uploadedImageUrl,
+      displayPicture:
+        uploadedImageUrl ||
+        "https://i.ibb.co.com/M5JS5qL/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black.png",
       ...formData,
       topics: topics,
     };
@@ -141,7 +110,7 @@ const SignUpPage: NextPage = () => {
     console.log("Sign Up Data =>", userData);
 
     handleUserSignUp(userData);
-    // userLoading(true);
+    userLoading(true);
   };
 
   useEffect(() => {
@@ -174,9 +143,13 @@ const SignUpPage: NextPage = () => {
           formData.sex
         );
       case 3:
-        return formData.city;
+        // return formData.city;
+        // Make city optional
+        return true;
       case 4:
-        return !!imageFile;
+        // return !!imageFile;
+        // Make imageFile optional
+        return true;
       case 5:
         console.log("formData after 5th step next button click => ", formData);
 
@@ -191,6 +164,21 @@ const SignUpPage: NextPage = () => {
   const handleInputChange = (name: string, value: string) => {
     console.log("Input change detected:", name, value);
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "city" && value.length > 0) {
+      setIsNext(true);
+    }
+  };
+
+  const handleCityChange = (value: string | null) => {
+    if (value) {
+      handleInputChange("city", value);
+    } else {
+      handleInputChange("city", cityInputValue);
+    }
+  };
+
+  const handleCityInputChange = (inputValue: string) => {
+    setCityInputValue(inputValue);
   };
 
   const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -241,7 +229,8 @@ const SignUpPage: NextPage = () => {
                     isRequired
                     label="Phone Number"
                     name="phone"
-                    type="tel"
+                    // type="tel"
+                    type="text"
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                   />
                 </div>
@@ -321,7 +310,12 @@ const SignUpPage: NextPage = () => {
                     loadOptions={fetchCities}
                     name="city"
                     placeholder="Type your city"
-                    onChange={(value) => handleInputChange("city", value)}
+                    // onChange={(value) => {
+                    //   console.log("Location Value => ", value);
+                    //   handleInputChange("city", value);
+                    // }}
+                    onInputChange={handleCityInputChange}
+                    onChange={handleCityChange}
                   />
                 </div>
                 <div className="flex justify-between">
@@ -339,7 +333,7 @@ const SignUpPage: NextPage = () => {
                     type="button"
                     onClick={nextStep}
                   >
-                    Next
+                    {!isNext ? <span>SKip</span> : <span>Next</span>}
                   </Button>
                 </div>
               </>
@@ -400,6 +394,7 @@ const SignUpPage: NextPage = () => {
               <>
                 <div className="py-3">
                   <CFTextarea
+                    isRequired
                     label="Bio"
                     name="bio"
                     onChange={(value) => handleInputChange("bio", value)}
@@ -443,7 +438,7 @@ const SignUpPage: NextPage = () => {
                 </div>
                 <div className="py-3">
                   <Input
-                    label="Topics"
+                    label="Cuisine Topics"
                     placeholder="Enter a topic and press enter"
                     value={inputTopic}
                     onChange={handleTopicInputChange}

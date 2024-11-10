@@ -17,6 +17,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit = (data: { password: string }) => {
     // Ensure the token is a string
+
     if (typeof token === "string") {
       resetPassword(
         { token, newPassword: data.password },
@@ -24,6 +25,7 @@ export default function ResetPasswordPage() {
           onSuccess: () => setPasswordReset(true),
         },
       );
+      // console.log(token, data);
     } else {
       console.error("Invalid token format");
     }
