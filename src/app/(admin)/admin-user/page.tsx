@@ -211,7 +211,7 @@ const AdminUser = () => {
                 <Link
                   href={`${window.location.origin}/profile/${user._id}`}
                   color="foreground"
-                  className="flex justify-between w-full"
+                  className="flex justify-between w-full hover:underline"
                 >
                   {user.name}
                 </Link>

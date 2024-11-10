@@ -17,6 +17,7 @@ import { useState } from "react";
 
 import { useDeleteRecipe, useFetchRecipes } from "@/src/hooks/post.hooks";
 import { RecipeInterface } from "@/src/components/post/UserRecipePost";
+import Link from "next/link";
 
 const AdminRecipe = () => {
   const {
@@ -132,8 +133,24 @@ const AdminRecipe = () => {
         <TableBody>
           {filteredRecipes.map((recipe: RecipeInterface) => (
             <TableRow key={recipe._id}>
-              <TableCell>{recipe.title}</TableCell>
-              <TableCell>{recipe.authorId.name}</TableCell>
+              <TableCell>
+                <Link
+                  href={`${window.location.origin}/recipe/${recipe._id}`}
+                  color="foreground"
+                  className="flex justify-between w-full hover:underline"
+                >
+                  {recipe.title}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Link
+                  href={`${window.location.origin}/profile/${recipe.authorId._id}`}
+                  color="foreground"
+                  className="flex justify-between w-full hover:underline"
+                >
+                  {recipe.authorId.name}
+                </Link>
+              </TableCell>
               <TableCell>{recipe.report}</TableCell>
               <TableCell>
                 <Button
