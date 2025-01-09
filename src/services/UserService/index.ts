@@ -12,7 +12,7 @@ export const getAllUsers = async () => {
     const { data } = await axiosInstance.get(`/users/`);
 
     if (data.success) {
-      console.log("users data => ", data);
+      // console.log("users data => ", data);
     }
 
     return data;
@@ -26,7 +26,7 @@ export const getSingleUser = async (id: string) => {
     const { data } = await axiosInstance.get(`/users/${id}`);
 
     if (data.success) {
-      console.log("user data => ", data);
+      // console.log("user data => ", data);
     }
 
     return data;

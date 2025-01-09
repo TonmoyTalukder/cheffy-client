@@ -63,11 +63,13 @@ export const Navbar = () => {
         href: profileId ? `/profile/${profileId}` : "/login",
       };
     }
+
     return item;
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.toLowerCase();
+
     setSearchTerm(searchTerm);
 
     if (searchTerm.length > 0) {
@@ -76,6 +78,7 @@ export const Navbar = () => {
           user.name.toLowerCase().includes(searchTerm) ||
           user.email.toLowerCase().includes(searchTerm),
       );
+
       setFilteredUsers(filtered.slice(0, 3)); // Limit to top 3 users
       setShowSuggestions(true);
     } else {
@@ -89,7 +92,9 @@ export const Navbar = () => {
       setShowSuggestions(false);
       setSearchTerm("");
     };
+
     document.addEventListener("click", handleClickOutside);
+
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
@@ -102,6 +107,7 @@ export const Navbar = () => {
 
   const handleSearchClick = () => {
     const formattedSearchTerm = searchTerm.trim().replace(/\s+/g, "+");
+
     router.push(`/search?searchText=${formattedSearchTerm}`);
     setShowSuggestions(false);
     setSearchTerm("");
@@ -114,7 +120,7 @@ export const Navbar = () => {
           position: "fixed",
           top: 0,
           width: "100%",
-          zIndex: 1000,
+          zIndex: 50,
           borderBottom: "1px solid var(--nextui-colors-border)",
           backgroundColor: "var(--nextui-colors-background)",
         }}
@@ -135,7 +141,7 @@ export const Navbar = () => {
               input: "text-small",
             }}
             style={{
-              marginRight: '3rem'
+              marginRight: "3rem",
             }}
             placeholder="Type to search..."
             size="md"
@@ -160,7 +166,7 @@ export const Navbar = () => {
                     linkStyles({ color: "foreground" }),
                     pathname === item.href
                       ? "text-indigo-500 font-medium"
-                      : "hover:text-indigo-500"
+                      : "hover:text-indigo-500",
                   )}
                   href={item.href}
                 >
@@ -197,7 +203,7 @@ export const Navbar = () => {
                     linkStyles({ color: "foreground" }),
                     pathname === item.href
                       ? "text-indigo-500 font-medium"
-                      : "hover:text-indigo-500"
+                      : "hover:text-indigo-500",
                   )}
                   href={`${item.href}`}
                   size="lg"

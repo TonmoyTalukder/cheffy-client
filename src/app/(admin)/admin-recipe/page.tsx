@@ -14,10 +14,10 @@ import {
   Switch,
 } from "@nextui-org/react";
 import { useState } from "react";
+import Link from "next/link";
 
 import { useDeleteRecipe, useFetchRecipes } from "@/src/hooks/post.hooks";
 import { RecipeInterface } from "@/src/components/post/UserRecipePost";
-import Link from "next/link";
 
 const AdminRecipe = () => {
   const {

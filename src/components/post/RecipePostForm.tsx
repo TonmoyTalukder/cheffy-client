@@ -1,33 +1,33 @@
-"use client";
+'use client';
 
-import { useState, ChangeEvent } from "react";
-import { Button, Input, Checkbox, Select, SelectItem } from "@nextui-org/react"; // Import NextUI components
-import { FaRegClock } from "react-icons/fa6";
-import { FiX } from "react-icons/fi";
+import { useState, ChangeEvent } from 'react';
+import { Button, Input, Checkbox, Select, SelectItem } from '@nextui-org/react'; 
+import { FaRegClock } from 'react-icons/fa6';
+import { FiX } from 'react-icons/fi';
 
-import { IRecipe, Ingredient, InstructionStep } from "@/src/types";
-import { uploadImageFile } from "@/src/utils/uploadImage";
-import { useUser } from "@/src/context/user.provider";
-import { useCreatePost } from "@/src/hooks/post.hooks";
+import { IRecipe, Ingredient, InstructionStep } from '@/src/types';
+import { uploadImageFile } from '@/src/utils/uploadImage';
+import { useUser } from '@/src/context/user.provider';
+import { useCreatePost } from '@/src/hooks/post.hooks';
 
-import RichTextEditor from "./RichTextEditor";
+import RichTextEditor from './RichTextEditor';
 
 const RecipePostForm = () => {
   const { mutate: handleCreatePost } = useCreatePost(); //isPending, isSuccess
 
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>(""); // Rich text for description
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>(''); // Rich text for description
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [newIngredient, setNewIngredient] = useState<Ingredient>({
-    name: "",
-    amount: "",
+    name: '',
+    amount: '',
   });
   const [instructions, setInstructions] = useState<InstructionStep[]>([]);
-  const [newInstruction, setNewInstruction] = useState<string>(""); // Rich text for new instruction step
+  const [newInstruction, setNewInstruction] = useState<string>(''); // Rich text for new instruction step
   const [instructionTime, setInstructionTime] = useState<number>(0); // Time for each instruction
   const [cookingTime, setCookingTime] = useState<number>(0);
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState<string>(""); // Input for new tag
+  const [newTag, setNewTag] = useState<string>(''); // Input for new tag
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isPremium, setIsPremium] = useState<boolean>(false);
@@ -62,10 +62,10 @@ const RecipePostForm = () => {
   const clearImage = () => {
     setImageFile(null);
     setImagePreview(null);
-    const fileInput = document.getElementById("image") as HTMLInputElement;
+    const fileInput = document.getElementById('image') as HTMLInputElement;
 
     if (fileInput) {
-      fileInput.value = "";
+      fileInput.value = '';
     }
   };
 
@@ -73,7 +73,7 @@ const RecipePostForm = () => {
   const handleAddIngredient = () => {
     if (newIngredient.name && newIngredient.amount) {
       setIngredients([...ingredients, newIngredient]);
-      setNewIngredient({ name: "", amount: "" });
+      setNewIngredient({ name: '', amount: '' });
     }
   };
 
@@ -84,7 +84,7 @@ const RecipePostForm = () => {
         ...instructions,
         { details: newInstruction, time: instructionTime },
       ]);
-      setNewInstruction("");
+      setNewInstruction('');
       setInstructionTime(0);
     }
   };
@@ -93,14 +93,14 @@ const RecipePostForm = () => {
   const handleAddTag = () => {
     if (newTag && !tags.includes(newTag)) {
       setTags([...tags, newTag]);
-      setNewTag("");
+      setNewTag('');
     }
   };
 
   const diets = [
-    { key: "veg", label: "Veg" },
-    { key: "vegan", label: "Vegan" },
-    { key: "non veg", label: "Non Veg" },
+    { key: 'veg', label: 'Veg' },
+    { key: 'vegan', label: 'Vegan' },
+    { key: 'non veg', label: 'Non Veg' },
   ];
 
   // Handle form submission
@@ -110,20 +110,20 @@ const RecipePostForm = () => {
     if (imageFile) {
       uploadedImageUrl = await uploadImageFile(imageFile);
       if (!uploadedImageUrl) {
-        alert("Image upload failed. Please try again.");
+        alert('Image upload failed. Please try again.');
 
         return;
       }
     }
 
-    const selectedDiet = Array.from(diet).join(", ");
+    const selectedDiet = Array.from(diet).join(', ');
 
-    const newRecipe: Omit<IRecipe, "_id"> = {
+    const newRecipe: Omit<IRecipe, '_id'> = {
       title,
       description,
       ingredients,
       instructions,
-      image: uploadedImageUrl || "",
+      image: uploadedImageUrl || '',
       cookingTime,
       ratings: [],
       ratingsCount: 0,
@@ -135,10 +135,10 @@ const RecipePostForm = () => {
       premium: isPremium,
       comments: [],
       diet: selectedDiet,
+      report: '0', 
     };
 
     console.log(newRecipe);
-    // Submit the newRecipe object to the backend (e.g., API call)
     handleCreatePost(newRecipe);
 
     setTimeout(() => {
@@ -259,7 +259,7 @@ const RecipePostForm = () => {
           placeholder="Add a tag"
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
+          onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
         />
         <div className="flex space-x-2 mt-2">
           {tags.map((tag, index) => (

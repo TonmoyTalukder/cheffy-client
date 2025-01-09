@@ -342,7 +342,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <>
               <ModalBody>
                 <UpdateRecipeForm
-                  recipe={{ ...recipe, authorId: recipe.authorId._id }}
+                  recipe={{ ...recipe, authorId: recipe.authorId._id, report: recipe.report.toString() }}
                   recipeId={recipe._id}
                 />
               </ModalBody>

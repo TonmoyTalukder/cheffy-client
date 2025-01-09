@@ -89,7 +89,7 @@ const SearchPage = () => {
     <div
       className="flex"
       style={{
-        marginTop: "7vh",
+        marginTop: "0vh",
       }}
     >
       <aside className="hidden lg:block w-64 p-4 bg-gray-100 dark:bg-gray-800 h-screen">
@@ -155,6 +155,36 @@ const SearchPage = () => {
             ))}
           </div>
         </div>
+
+        {/* Suggestions
+      {searchText && filteredUsers.length > 0 && (
+        <div className="absolute top-3 z-10 bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-600 rounded-lg w-full max-w-xl mt-2 px-4 py-3">
+          {filteredUsers.map((user) => (
+            <div
+              key={user._id}
+              role="button"
+              tabIndex={0}
+              className="flex items-center gap-3 mt-6 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+              onClick={() => handleUserClick(user._id!)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleUserClick(user._id!);
+                }
+              }}
+            >
+              <Avatar src={user.displayPicture || ""} size="sm" />
+              <div>
+                <p className="font-medium text-gray-800 dark:text-gray-200">
+                  {user.name}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )} */}
       </div>
     </div>
   );

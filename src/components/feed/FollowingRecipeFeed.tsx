@@ -5,15 +5,22 @@ import { useFetchFeedRecipes } from '@/src/hooks/post.hooks';
 
 import RecipeCard from './RecipeCard';
 import LoadingRecipeCard from './LoadingRecipeCard';
+import { useUser } from '@/src/context/user.provider';
 
 interface RecipeFeedProps {
   userId: string;
   limit?: number;
 }
 
-const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
+const FollowingRecipeFeed: React.FC<RecipeFeedProps> = ({
+  userId,
+  limit = 5,
+}) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useFetchFeedRecipes(userId, limit);
+
+  const { user, isLoading } = useUser();
+  console.log('User => ', user);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [repeatedData, setRepeatedData] = useState<any[]>([]);
@@ -65,7 +72,7 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
 
   if (status === 'pending') {
     return (
-      <div className="recipe-feed-container w-full">
+      <div className="recipe-feed-container xl:w-5/12 lg:w-5/12 md:w-7/12 sm:w-auto">
         <LoadingRecipeCard />
       </div>
     );
@@ -86,8 +93,7 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
         <RecipeCard key={`${recipe._id}-${index}`} recipe={recipe} />
       ))}
 
-      <div ref={ref} className="w-full">
-        <LoadingRecipeCard />
+      <div ref={ref} className="sentinel">
         {isFetchingNextPage || isLoadingRepeatedData ? (
           <LoadingRecipeCard />
         ) : null}
@@ -96,4 +102,4 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
   );
 };
 
-export default RecipeFeed;
+export default FollowingRecipeFeed;

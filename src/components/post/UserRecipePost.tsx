@@ -69,7 +69,7 @@ export interface RecipeInterface {
   premium: boolean;
   comments: IComment[];
   diet: string;
-  report: number;
+  report: string;
 }
 
 interface UserRecipePostProps {

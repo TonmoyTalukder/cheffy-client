@@ -49,7 +49,7 @@ export const forgetPassword = async (email: string) => {
   } catch (error: any) {
     throw new Error(
       error.response?.data?.error ||
-      "An error occurred during password recovery.",
+        "An error occurred during password recovery.",
     );
   }
 };

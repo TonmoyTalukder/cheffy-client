@@ -8,7 +8,7 @@ import { MdOutlineReportProblem } from "react-icons/md";
 
 const LoadingRecipeCard: React.FC = () => {
   return (
-    <div className="recipe-card border p-4 mb-4 shadow-sm rounded-lg">
+    <div className="recipe-card border p-4 mb-4 shadow-sm rounded-lg w-full">
       <div className="flex items-center mb-3">
         <Skeleton
           as={Avatar}
