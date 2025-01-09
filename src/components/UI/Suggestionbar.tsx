@@ -1,4 +1,4 @@
-import WhomTOFollow from '../suggestion/WhomTOFollow';
+import WhomTOFollow from "../suggestion/WhomTOFollow";
 
 const SuggestionBar = () => {
   return (

@@ -1,8 +1,9 @@
-import React from 'react';
-import RecipeFeed from './RecipeFeed';
-import { Tabs, Tab } from '@nextui-org/react';
-import FollowingRecipeFeed from './FollowingRecipeFeed';
-import WritePost from './WritePost';
+import React from "react";
+import { Tabs, Tab } from "@nextui-org/react";
+
+import RecipeFeed from "./RecipeFeed";
+import FollowingRecipeFeed from "./FollowingRecipeFeed";
+import WritePost from "./WritePost";
 
 interface FeedMenuProps {
   userId: string;

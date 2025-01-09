@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Button,
@@ -15,17 +15,17 @@ import {
   useDisclosure,
   Checkbox,
   CheckboxGroup,
-} from '@nextui-org/react';
-import { MdSearch } from 'react-icons/md';
-import { AiOutlineSetting } from 'react-icons/ai';
-import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+} from "@nextui-org/react";
+import { MdSearch } from "react-icons/md";
+import { AiOutlineSetting } from "react-icons/ai";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import { useGetAllUsers } from '@/src/hooks/user.hooks';
-import { IRecipeResponse, IUser } from '@/src/types';
-import { useFetchRecipes } from '@/src/hooks/post.hooks';
-import RecipeCard from '@/src/components/feed/RecipeCard';
+import { useGetAllUsers } from "@/src/hooks/user.hooks";
+import { IRecipeResponse, IUser } from "@/src/types";
+import { useFetchRecipes } from "@/src/hooks/post.hooks";
+import RecipeCard from "@/src/components/feed/RecipeCard";
 
 const MAX_DISPLAY_ITEMS = 3;
 
@@ -36,14 +36,13 @@ const SearchPage = () => {
   const { data: recipesData } = useFetchRecipes();
   const recipes = recipesData || [];
 
-
   const [showUsers, setShowUsers] = useState(true);
   const [showRecipes, setShowRecipes] = useState(true);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
   const [selectedUserDiets, setSelectedUserDiets] = useState<string[]>([]);
-  const [selectedCookingTime, setSelectedCookingTime] = useState<number | ''>(
-    '',
+  const [selectedCookingTime, setSelectedCookingTime] = useState<number | "">(
+    "",
   );
   const [selectedRecipeDiets, setSelectedRecipeDiets] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -205,7 +204,7 @@ const SearchPage = () => {
             )}
             {showUsers && (
               <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push('/follow')}>
+                <Button variant="flat" onClick={() => router.push("/follow")}>
                   See More
                 </Button>
               </div>
@@ -248,7 +247,7 @@ const SearchPage = () => {
             )}
             {showRecipes && (
               <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push('/')}>
+                <Button variant="flat" onClick={() => router.push("/")}>
                   See More
                 </Button>
               </div>
@@ -283,7 +282,7 @@ const SearchPage = () => {
                   type="number"
                   value={selectedCookingTime.toString()}
                   onChange={(e) =>
-                    setSelectedCookingTime(Number(e.target.value) || '')
+                    setSelectedCookingTime(Number(e.target.value) || "")
                   }
                 />
                 <CheckboxGroup
@@ -303,7 +302,7 @@ const SearchPage = () => {
                 <Button
                   color="primary"
                   onPress={() => {
-                    console.log('Apply Filters:', {
+                    console.log("Apply Filters:", {
                       selectedUserDiets,
                       selectedCookingTime,
                       selectedRecipeDiets,

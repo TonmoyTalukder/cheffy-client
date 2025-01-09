@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useFollowUser, useGetAllUsers } from '@/src/hooks/user.hooks';
-import { useUser } from '@/src/context/user.provider';
-import { Card, Avatar, Tooltip, CardBody, Button } from '@nextui-org/react';
-import { IUser } from '@/src/types';
+import { useEffect, useState } from "react";
+import { Card, Avatar, Tooltip, CardBody, Button } from "@nextui-org/react";
+
+import { useFollowUser, useGetAllUsers } from "@/src/hooks/user.hooks";
+import { useUser } from "@/src/context/user.provider";
+import { IUser } from "@/src/types";
 
 const WhomToFollow = () => {
   const { data: usersFetchedData } = useGetAllUsers();
@@ -28,8 +29,10 @@ const WhomToFollow = () => {
       const rankedUsers = notFollowedUsers
         .map((u: IUser) => {
           let rank = 0;
+
           if (u.foodHabit === user.foodHabit) rank += 5;
           if (u.city === user.city) rank += 2;
+
           return { ...u, rank };
         })
         .sort((a: any, b: any) => b.rank - a.rank);
@@ -80,7 +83,7 @@ const WhomToFollow = () => {
                     size="md"
                     onClick={() => user?._id && handleFollowUnfollow(user._id)}
                   >
-                    {followLoading ? 'Following...' : 'Follow'}
+                    {followLoading ? "Following..." : "Follow"}
                   </Button>
                 </Tooltip>
               </div>

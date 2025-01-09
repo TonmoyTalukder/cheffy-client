@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import React, { useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
-import { useFetchFeedRecipes } from '@/src/hooks/post.hooks';
+import { useFetchFeedRecipes } from "@/src/hooks/post.hooks";
 
-import RecipeCard from './RecipeCard';
-import LoadingRecipeCard from './LoadingRecipeCard';
+import RecipeCard from "./RecipeCard";
+import LoadingRecipeCard from "./LoadingRecipeCard";
 
 interface RecipeFeedProps {
   userId: string;
@@ -63,7 +63,7 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
     }
   }, [inView, isRepeating, isLoadingRepeatedData, data]);
 
-  if (status === 'pending') {
+  if (status === "pending") {
     return (
       <div className="recipe-feed-container w-full">
         <LoadingRecipeCard />
@@ -71,7 +71,7 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return <p>Failed to load recipes.</p>;
   }
 

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   AiOutlineHome,
   AiOutlineCompass,
@@ -10,10 +10,10 @@ import {
   AiOutlineUser,
   AiOutlineSetting,
   AiOutlineUsergroupAdd,
-} from 'react-icons/ai';
-import { RxDotsHorizontal } from 'react-icons/rx';
-import { RiQuillPenLine } from 'react-icons/ri';
-import NextLink from 'next/link';
+} from "react-icons/ai";
+import { RxDotsHorizontal } from "react-icons/rx";
+import { RiQuillPenLine } from "react-icons/ri";
+import NextLink from "next/link";
 import {
   Dropdown,
   DropdownTrigger,
@@ -21,19 +21,19 @@ import {
   DropdownItem,
   Button,
   Avatar,
-} from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
+} from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
-import { logout } from '@/src/services/AuthService';
-import { useUser } from '@/src/context/user.provider';
+import { logout } from "@/src/services/AuthService";
+import { useUser } from "@/src/context/user.provider";
 
-import { Logo } from './icons';
+import { Logo } from "./icons";
 
 const SideNavbar: React.FC = () => {
   const { user, setIsLoading: userLoading } = useUser();
   const profileId = user?._id;
   const avatarUrl =
-    user?.displayPicture || 'https://i.ibb.co.com/wcv1QBQ/5951752.png';
+    user?.displayPicture || "https://i.ibb.co.com/wcv1QBQ/5951752.png";
   const router = useRouter();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,23 +41,23 @@ const SideNavbar: React.FC = () => {
   // console.log(user);
 
   const menuItems = [
-    { name: 'Home', icon: AiOutlineHome, href: '/' },
-    { name: 'Explore', icon: AiOutlineCompass, href: '/explore' },
-    { name: 'Premiums', icon: AiOutlineStar, href: '/premium-recipes' },
-    { name: 'Bookmarks', icon: AiOutlineBook, href: '/bookmarks' },
-    { name: 'Follow Users', icon: AiOutlineUsergroupAdd, href: '/follow' },
-    { name: 'Premium Plan', icon: AiOutlineCrown, href: '/premium-plan' },
-    { name: 'Profile', icon: AiOutlineUser, href: `/profile/${profileId}` },
-    { name: 'Settings', icon: AiOutlineSetting, href: '/settings' },
+    { name: "Home", icon: AiOutlineHome, href: "/" },
+    { name: "Explore", icon: AiOutlineCompass, href: "/explore" },
+    { name: "Premiums", icon: AiOutlineStar, href: "/premium-recipes" },
+    { name: "Bookmarks", icon: AiOutlineBook, href: "/bookmarks" },
+    { name: "Follow Users", icon: AiOutlineUsergroupAdd, href: "/follow" },
+    { name: "Premium Plan", icon: AiOutlineCrown, href: "/premium-plan" },
+    { name: "Profile", icon: AiOutlineUser, href: `/profile/${profileId}` },
+    { name: "Settings", icon: AiOutlineSetting, href: "/settings" },
   ];
 
   const handleLogout = async () => {
     try {
       await logout();
       userLoading(true);
-      router.replace('/login');
+      router.replace("/login");
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error("Error logging out:", error);
     } finally {
       userLoading(false);
     }
