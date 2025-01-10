@@ -223,14 +223,14 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
   // console.log("filteredRecipes => ", filteredRecipes);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full">
+    <div className="flex flex-col items-center justify-center w-10/12">
       {filteredRecipes.length === 0 && (
         <p className="text-gray-500 mt-2">No posts yet.</p>
       )}
       {filteredRecipes.map((recipe: RecipeInterface) => (
         <Card
           key={recipe._id}
-          className="w-full max-w-md shadow-lg transition-transform transform hover:scale-105 rounded-lg overflow-hidden my-4"
+          className="w-full shadow-lg transition-transform transform hover:scale-105 rounded-lg overflow-hidden my-4"
         >
           {/* Card Header with Author Info */}
 

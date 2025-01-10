@@ -1,12 +1,12 @@
-import { SVGProps } from "react";
+import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
 export interface IInput {
-  variant?: "flat" | "bordered" | "faded" | "underlined";
-  size?: "sm" | "md" | "lg";
+  variant?: 'flat' | 'bordered' | 'faded' | 'underlined';
+  size?: 'sm' | 'md' | 'lg';
   required?: boolean;
   type?: string;
   label: string;
@@ -15,13 +15,13 @@ export interface IInput {
 }
 
 export const USER_ROLE = {
-  ADMIN: "ADMIN",
-  USER: "USER",
+  ADMIN: 'ADMIN',
+  USER: 'USER',
 } as const;
 
 export const USER_STATUS = {
-  ACTIVE: "ACTIVE",
-  BLOCKED: "BLOCKED",
+  ACTIVE: 'ACTIVE',
+  BLOCKED: 'BLOCKED',
 } as const;
 
 export type TFollowUser = {
@@ -41,16 +41,17 @@ export interface IUser {
   role: keyof typeof USER_ROLE;
   status: keyof typeof USER_STATUS;
   bio?: string;
-  city: string;
+  city?: string;
   coverPicture?: string;
   followers?: Array<TFollowUser>;
   following?: Array<TFollowUser>;
-  foodHabit: string;
-  sex: string;
+  foodHabit?: string;
+  sex?: string;
   diet: string;
   topics?: Array<string>;
   isPremium?: boolean;
-  report: number;
+  report?: number;
+  premiumExpiryDate?: any;
   createdAt: string;
   updatedAt: string;
   __v?: number;
@@ -94,6 +95,7 @@ export interface IRecipeResponse {
   authorId: IAuthor;
   premium: boolean;
   comments: IComment[];
+  diet: string;
   report: string;
 }
 

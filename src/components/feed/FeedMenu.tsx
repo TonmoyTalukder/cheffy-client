@@ -17,7 +17,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ userId }) => {
         variant="underlined"
         className="sticky top-0 h-[5vh] py-2 mt-0 mb-2 z-10 bg-white w-full"
       >
-        <Tab key="foryou" title="For You">
+        <Tab key="foryou" title="For You" className="px-2">
           <div className="mt-3">
             <WritePost />
             <RecipeFeed userId={userId} />

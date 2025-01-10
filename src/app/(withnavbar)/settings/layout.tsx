@@ -7,12 +7,10 @@ export default function ProfileLayout({
 }) {
   return (
     <section className="flex flex-col items-center justify-center">
-      <div className="w-full text-center flex flex-col justify-center">
-        <div className="sticky top-0 z-50 bg-zinc-100 px-2 py-3 w-full h-[5vh]">
-          <BackRouter />
-        </div>
-        <div className="">{children}</div>
+      <div className="sticky top-0 z-50 bg-zinc-100 px-2 py-3 w-full h-[5vh]">
+        <BackRouter />
       </div>
+      <div className="w-full">{children}</div>
     </section>
   );
 }

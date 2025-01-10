@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
-import { FiUser, FiMail, FiPhone, FiLock } from "react-icons/fi";
-import { useEffect, useState } from "react";
-import moment from "moment";
-import { FaCity, FaGenderless, FaUtensils } from "react-icons/fa";
+import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
+import { FiUser, FiMail, FiPhone, FiLock } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import moment from 'moment';
+import { FaCity, FaGenderless, FaUtensils } from 'react-icons/fa';
 
-import { useGetSingleUser } from "@/src/hooks/user.hooks";
-import { useChangePassword } from "@/src/hooks/auth.hooks";
-import { useUser } from "@/src/context/user.provider";
+import { useGetSingleUser } from '@/src/hooks/user.hooks';
+import { useChangePassword } from '@/src/hooks/auth.hooks';
+import { useUser } from '@/src/context/user.provider';
 
 interface IProps {
   profileId: string;
@@ -23,8 +23,8 @@ const About = ({ profileId }: IProps) => {
   const isOwner = profileId === loggedUser?._id ? true : false;
 
   const [premiumTimeLeft, setPremiumTimeLeft] = useState<string | null>(null);
-  const [oldPass, setOldPass] = useState("");
-  const [newPass, setNewPass] = useState("");
+  const [oldPass, setOldPass] = useState('');
+  const [newPass, setNewPass] = useState('');
 
   useEffect(() => {
     if (visitingUser?.isPremium) {
@@ -41,11 +41,11 @@ const About = ({ profileId }: IProps) => {
 
         // Format the time as dd:hh:mm:ss
         setPremiumTimeLeft(
-          `${days.toString().padStart(2, "0")}:${hours
+          `${days.toString().padStart(2, '0')}:${hours
             .toString()
-            .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+            .padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
             .toString()
-            .padStart(2, "0")}`,
+            .padStart(2, '0')}`,
         );
       };
 
@@ -64,13 +64,13 @@ const About = ({ profileId }: IProps) => {
     const data = {
       oldPassword: oldPass,
       newPassword: newPass,
-      email: visitingUser.email,
+      email: visitingUser?.email,
     };
 
     console.log(data);
     changePassword(data);
-    setOldPass("");
-    setNewPass("");
+    setOldPass('');
+    setNewPass('');
   };
 
   return (
@@ -85,11 +85,11 @@ const About = ({ profileId }: IProps) => {
                   <div className="flex items-center space-x-2">
                     <FiUser className="text-gray-500" />
                     <span className="font-bold">Name: </span>
-                    <span>{visitingUser?.name || "N/A"}</span>
+                    <span>{visitingUser?.name || 'N/A'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <FaGenderless className="text-gray-500" />
-                    <strong>Sex:</strong> {visitingUser.sex}
+                    <strong>Sex:</strong> {visitingUser?.sex}
                   </div>
                   {/* <div className="flex items-center space-x-2">
                     <FiStar className="text-gray-500" />
@@ -99,16 +99,16 @@ const About = ({ profileId }: IProps) => {
                   <div className="flex items-center space-x-2">
                     <FaCity className="text-gray-500" />
                     <span className="font-bold">City: </span>
-                    <span>{visitingUser?.city || "N/A"}</span>
+                    <span>{visitingUser?.city || 'N/A'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <FaUtensils className="text-gray-500" />
                     <span className="font-bold">Food Habit: </span>
-                    {visitingUser.foodHabit === "vegan" ? (
+                    {visitingUser?.foodHabit === 'vegan' ? (
                       <span>Vegan</span>
-                    ) : visitingUser.foodHabit === "veg" ? (
+                    ) : visitingUser?.foodHabit === 'veg' ? (
                       <span>Vegan</span>
-                    ) : visitingUser.foodHabit === "non_veg" ? (
+                    ) : visitingUser?.foodHabit === 'non_veg' ? (
                       <span>Non Veg</span>
                     ) : (
                       <span>N/A</span>
@@ -116,7 +116,7 @@ const About = ({ profileId }: IProps) => {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <strong>Topics:</strong> {visitingUser.topics?.join(", ")}
+                    <strong>Topics:</strong> {visitingUser?.topics?.join(', ')}
                   </div>
                 </div>
               </CardBody>
@@ -131,12 +131,12 @@ const About = ({ profileId }: IProps) => {
                   <div className="flex items-center space-x-2">
                     <FiMail className="text-gray-500" />
                     <span className="font-bold">Email: </span>
-                    <span>{visitingUser?.email || "N/A"}</span>
+                    <span>{visitingUser?.email || 'N/A'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <FiPhone className="text-gray-500" />
                     <span className="font-bold">Phone: </span>
-                    <span>{visitingUser?.phone || "N/A"}</span>
+                    <span>{visitingUser?.phone || 'N/A'}</span>
                   </div>
                 </div>
               </CardBody>
@@ -153,10 +153,10 @@ const About = ({ profileId }: IProps) => {
                       Premium Active
                     </div>
                     <div className="text-lg">
-                      Expires in:{" "}
+                      Expires in:{' '}
                       <span className="font-bold">
-                        {premiumTimeLeft || "Loading..."}
-                      </span>{" "}
+                        {premiumTimeLeft || 'Loading...'}
+                      </span>{' '}
                       (dd:hh:mm:ss)
                     </div>
                   </div>
@@ -179,7 +179,7 @@ const About = ({ profileId }: IProps) => {
                   <div className="space-y-8">
                     <div className="flex flex-col items-start gap-1 space-x-2">
                       <span className="font-bold flex flex-row items-center gap-1">
-                        <FiLock className="text-gray-500" /> Current Password:{" "}
+                        <FiLock className="text-gray-500" /> Current Password:{' '}
                       </span>
                       <input
                         type="password"
@@ -193,7 +193,7 @@ const About = ({ profileId }: IProps) => {
                     <div className="flex flex-col items-start gap-1 space-x-2">
                       <span className="font-bold  flex flex-row items-center gap-1">
                         <FiLock className="text-gray-500" />
-                        New Password:{" "}
+                        New Password:{' '}
                       </span>
                       <input
                         type="password"

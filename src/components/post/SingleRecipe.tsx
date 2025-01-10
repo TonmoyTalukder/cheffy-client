@@ -470,9 +470,9 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
         // marginTop: "5%",
         overflowX: "hidden",
       }}
-      className="flex flex-col items-center w-full p-4 md:p-8 mt-12"
+      className="flex flex-col items-center w-full p-4 mt-3"
     >
-      <Card className="w-full max-w-3xl shadow-lg rounded-lg overflow-hidden">
+      <Card className="w-full shadow-lg rounded-lg overflow-hidden">
         <CardHeader className="flex justify-between p-4">
           <div className="flex items-center gap-4">
             <Avatar

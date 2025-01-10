@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Avatar, Button, ScrollShadow, Spinner } from "@nextui-org/react";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { Avatar, Button, ScrollShadow, Spinner } from '@nextui-org/react';
+import Link from 'next/link';
 
-import { usePatronSuggestion, useFollowUser } from "@/src/hooks/user.hooks";
-import { useUser } from "@/src/context/user.provider";
-import { IUser, TFollowUser } from "@/src/types";
+import { usePatronSuggestion, useFollowUser } from '@/src/hooks/user.hooks';
+import { useUser } from '@/src/context/user.provider';
+import { IUser, TFollowUser } from '@/src/types';
 
 export default function FollowPage() {
   const { user: currentUser } = useUser();
@@ -59,12 +59,7 @@ export default function FollowPage() {
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          marginTop: "10%",
-        }}
-        className="flex flex-col justify-center items-center"
-      >
+      <div className="flex flex-col justify-center items-center">
         <Spinner color="primary" size="lg" className="my-8" />
       </div>
     );
@@ -78,19 +73,25 @@ export default function FollowPage() {
     <ScrollShadow
       className="flex flex-col justify-center items-center"
       hideScrollBar
-      style={{
-        marginTop: "6.5vh",
-      }}
     >
-      <div className="xl:w-4/12 lg:w-4/12 md:w-5/12 sm:w-auto max-h-[92vh] mt-8 md:mt-10 sm:mt-0">
+      <div className="w-full mt-0 flex flex-col items-center">
         {data && data.data.length > 0 && (
-          <h1 className="text-center my-3">Suggested Patrons to Follow</h1>
+          <div className="w-full bg-white z-10">
+            <h1 className="text-center text-lg my-3">
+              Suggested Patrons to Follow
+            </h1>
+          </div>
         )}
-        <div className="grid grid-cols-1 gap-1 w-full mb-3">
+        <div
+          className="grid grid-cols-1 gap-1 w-full md:w-3/4 mb-3"
+          style={{
+            marginTop: '2.5vh',
+          }}
+        >
           {data && data.data.length > 0 ? (
             data.data.map(
               (user: IUser) =>
-                user.role === "USER" && (
+                user.role === 'USER' && (
                   <div
                     key={user._id} // Assuming user._id exists for all
                     className="flex items-center justify-between p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 w-auto mb-2"
@@ -101,7 +102,7 @@ export default function FollowPage() {
                         className="border-4 object-cover mr-4"
                         src={
                           user.displayPicture ||
-                          "https://i.ibb.co/wcv1QBQ/5951752.png"
+                          'https://i.ibb.co/wcv1QBQ/5951752.png'
                         }
                       />
                       <div>
@@ -123,7 +124,7 @@ export default function FollowPage() {
                             user._id && handleFollowUnfollow(user._id)
                           } // Ensure user._id exists
                         >
-                          {followLoading ? "Unfollowing..." : "Unfollow"}
+                          {followLoading ? 'Unfollowing...' : 'Unfollow'}
                         </Button>
                       ) : (
                         <Button
@@ -134,7 +135,7 @@ export default function FollowPage() {
                             user._id && handleFollowUnfollow(user._id)
                           } // Ensure user._id exists
                         >
-                          {followLoading ? "Following..." : "Follow"}
+                          {followLoading ? 'Following...' : 'Follow'}
                         </Button>
                       )}
                     </div>
@@ -142,7 +143,14 @@ export default function FollowPage() {
                 ),
             )
           ) : (
-            <p className="text-center">No suggested patrons available.</p>
+            <p
+              className="text-center"
+              style={{
+                marginTop: '1.5vh',
+              }}
+            >
+              No suggested patrons available.
+            </p>
           )}
         </div>
       </div>

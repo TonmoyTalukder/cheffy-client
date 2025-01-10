@@ -13,10 +13,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <SideNavbar />
             </div>
 
-            <div className="basis-full md:flex-grow md:basis-4/5 mx-2 md:mx-1">
+            <div className="basis-full md:flex-grow md:basis-4/5 mx-0 md:mx-0">
               <div className="flex flex-row">
                 {/* Main Content */}
-                <div className="basis-full md:basis-3/5 mx-2 sm:mx-1">
+                <div className="basis-full md:basis-3/5 mx-0 sm:mx-0">
                   {children}
                 </div>
 

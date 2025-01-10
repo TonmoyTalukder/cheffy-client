@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -15,19 +15,16 @@ import {
   useDisclosure,
   Checkbox,
   CheckboxGroup,
-} from "@nextui-org/react";
-import { MdSearch } from "react-icons/md";
-import { AiOutlineSetting } from "react-icons/ai";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+} from '@nextui-org/react';
+import { MdSearch } from 'react-icons/md';
+import { AiOutlineSetting } from 'react-icons/ai';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-import { useGetAllUsers } from "@/src/hooks/user.hooks";
-import { IRecipeResponse, IUser } from "@/src/types";
-import { useFetchRecipes } from "@/src/hooks/post.hooks";
-import RecipeCard from "@/src/components/feed/RecipeCard";
-
-const MAX_DISPLAY_ITEMS = 3;
+import { useGetAllUsers } from '@/src/hooks/user.hooks';
+import { IRecipeResponse, IUser } from '@/src/types';
+import { useFetchRecipes } from '@/src/hooks/post.hooks';
+import RecipeCard from '@/src/components/feed/RecipeCard';
 
 const SearchPage = () => {
   const router = useRouter();
@@ -36,38 +33,18 @@ const SearchPage = () => {
   const { data: recipesData } = useFetchRecipes();
   const recipes = recipesData || [];
 
-  const [showUsers, setShowUsers] = useState(true);
-  const [showRecipes, setShowRecipes] = useState(true);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
   const [selectedUserDiets, setSelectedUserDiets] = useState<string[]>([]);
-  const [selectedCookingTime, setSelectedCookingTime] = useState<number | "">(
-    "",
+  const [selectedCookingTime, setSelectedCookingTime] = useState<number | ''>(
+    '',
   );
   const [selectedRecipeDiets, setSelectedRecipeDiets] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [filteredRecipes, setFilteredRecipes] = useState<IRecipeResponse[]>([]);
 
-  // console.log('user Data =>', usersData);
-  // console.log('recipe Data =>', filteredRecipes);
-
-  const fetchLatestUsers = (users: IUser[]) => {
-    return [...users]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, MAX_DISPLAY_ITEMS);
-  };
-
-  const fetchLatestRecipes = (recipes: IRecipeResponse[]) => {
-    return [...recipes]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, MAX_DISPLAY_ITEMS);
-  };
+  console.log('user Data =>', filteredUsers);
+  console.log('recipe Data =>', filteredRecipes);
 
   useEffect(() => {
     if (searchText) {
@@ -77,7 +54,7 @@ const SearchPage = () => {
           user.email.toLowerCase().includes(searchText.toLowerCase()),
       );
 
-      setFilteredUsers(filteredUsers.slice(0, MAX_DISPLAY_ITEMS));
+      setFilteredUsers(filteredUsers);
 
       const filteredRecipes = recipes.filter(
         (recipe: IRecipeResponse) =>
@@ -85,10 +62,25 @@ const SearchPage = () => {
           recipe.description.toLowerCase().includes(searchText.toLowerCase()),
       );
 
-      setFilteredRecipes(filteredRecipes.slice(0, MAX_DISPLAY_ITEMS));
+      setFilteredRecipes(filteredRecipes);
     } else {
-      setFilteredUsers(fetchLatestUsers(usersData));
-      setFilteredRecipes(fetchLatestRecipes(recipes));
+      const latestUsers = [...usersData]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 3);
+
+      setFilteredUsers(latestUsers);
+
+      const latestRecipes = [...recipes]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 3);
+
+      setFilteredRecipes(latestRecipes);
     }
   }, [searchText, usersData, recipes]);
 
@@ -98,9 +90,16 @@ const SearchPage = () => {
         selectedUserDiets.includes(user.foodHabit),
       );
 
-      setFilteredUsers(filteredUsers.slice(0, MAX_DISPLAY_ITEMS));
+      setFilteredUsers(filteredUsers);
     } else {
-      setFilteredUsers(fetchLatestUsers(usersData));
+      const latestUsers = [...usersData]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 3);
+
+      setFilteredUsers(latestUsers);
     }
 
     if (selectedRecipeDiets.length > 0 || selectedCookingTime) {
@@ -114,9 +113,16 @@ const SearchPage = () => {
             : true),
       );
 
-      setFilteredRecipes(filteredRecipes.slice(0, MAX_DISPLAY_ITEMS));
+      setFilteredRecipes(filteredRecipes);
     } else {
-      setFilteredRecipes(fetchLatestRecipes(recipes));
+      const latestRecipes = [...recipes]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 3);
+
+      setFilteredRecipes(latestRecipes);
     }
   }, [
     selectedUserDiets,
@@ -159,100 +165,72 @@ const SearchPage = () => {
         <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 mb-4">
           Explore
         </h2>
-
-        {/* Users Section */}
         {filteredUsers.length > 0 && (
-          <>
-            <div className="flex justify-between items-center">
-              <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4 mt-6">
-                Users
-              </h2>
-              <button
-                className="text-blue-500 hover:underline"
-                onClick={() => setShowUsers(!showUsers)}
-              >
-                {showUsers ? <IoIosArrowUp /> : <IoIosArrowDown />}
-              </button>
-            </div>
-            {showUsers && (
-              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-                {filteredUsers.map((user) => (
-                  <Card
-                    key={user._id}
-                    isHoverable
-                    isPressable
-                    onPress={() => handleUserClick(user._id!)}
-                  >
-                    <Link
-                      href={`/profile/${user._id}`}
-                      className="no-underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <CardHeader>
-                        <Avatar src={user.displayPicture} size="lg" />
-                        <div className="ml-4 text-start">
-                          <h1 className="text-gray-800 dark:text-gray-200">
-                            {user.name}
-                          </h1>
-                          <p className="text-gray-500">{user.email}</p>
-                        </div>
-                      </CardHeader>
-                    </Link>
-                  </Card>
-                ))}
-              </div>
-            )}
-            {showUsers && (
-              <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push("/follow")}>
-                  See More
-                </Button>
-              </div>
-            )}
-          </>
+          <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4 mt-6">
+            Users
+          </h2>
         )}
-
-        {/* Recipes Section */}
-        {filteredRecipes.length > 0 && (
-          <>
-            <div className="flex justify-between items-center">
-              <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4 mt-6">
-                Recipes
-              </h2>
-              <button
-                className="text-blue-500 hover:underline"
-                onClick={() => setShowRecipes(!showRecipes)}
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+          {filteredUsers.map((user) => (
+            <Card
+              key={user._id}
+              isHoverable
+              isPressable
+              onPress={() => handleUserClick(user._id!)}
+            >
+              <Link
+                href={`/profile/${user._id}`}
+                className="no-underline"
+                onClick={(e) => e.stopPropagation()}
               >
-                {showRecipes ? <IoIosArrowUp /> : <IoIosArrowDown />}
-              </button>
-            </div>
-            {showRecipes && (
-              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-                {filteredRecipes.map((recipe) => (
-                  <RecipeCard
-                    key={`${recipe._id}`}
-                    recipe={{
-                      ...recipe,
-                      authorId: {
-                        _id: recipe.authorId._id,
-                        name: recipe.authorId.name,
-                        displayPicture: recipe.authorId.displayPicture,
-                        email: recipe.authorId.email,
-                      },
-                      report: recipe.report.toString(),
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-            {showRecipes && (
-              <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push("/")}>
-                  See More
-                </Button>
-              </div>
-            )}
-          </>
+                <CardHeader>
+                  <Avatar src={user.displayPicture} size="lg" />
+                  <div className="ml-4 text-start">
+                    <h1 className="text-gray-800 dark:text-gray-200">
+                      {user.name}
+                    </h1>
+                    <p className="text-gray-500">{user.email}</p>
+                  </div>
+                </CardHeader>
+              </Link>
+            </Card>
+          ))}
+        </div>
+        {filteredUsers.length > 0 && (
+          <div className="text-center mt-4">
+            <Button variant="flat" onClick={() => router.push('/follow')}>
+              See More
+            </Button>
+          </div>
+        )}
+        {filteredRecipes.length > 0 && (
+          <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4 mt-6">
+            Recipes
+          </h2>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+          {filteredRecipes.map((recipe) => (
+            <RecipeCard
+              key={`${recipe._id}`}
+              recipe={{
+                ...recipe,
+                authorId: {
+                  _id: recipe.authorId._id,
+                  name: recipe.authorId.name,
+                  displayPicture: recipe.authorId.displayPicture,
+                  email: recipe.authorId.email,
+                },
+                report: recipe.report.toString(),
+              }}
+            />
+          ))}
+        </div>
+        {filteredRecipes.length > 0 && (
+          <div className="text-center mt-4">
+            <Button variant="flat" onClick={() => router.push('/')}>
+              See More
+            </Button>
+          </div>
         )}
       </div>
 
@@ -282,7 +260,7 @@ const SearchPage = () => {
                   type="number"
                   value={selectedCookingTime.toString()}
                   onChange={(e) =>
-                    setSelectedCookingTime(Number(e.target.value) || "")
+                    setSelectedCookingTime(Number(e.target.value) || '')
                   }
                 />
                 <CheckboxGroup
@@ -302,7 +280,7 @@ const SearchPage = () => {
                 <Button
                   color="primary"
                   onPress={() => {
-                    console.log("Apply Filters:", {
+                    console.log('Apply Filters:', {
                       selectedUserDiets,
                       selectedCookingTime,
                       selectedRecipeDiets,
