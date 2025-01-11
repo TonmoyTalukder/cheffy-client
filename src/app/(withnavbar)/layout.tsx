@@ -1,5 +1,7 @@
+import MobileNavbar from "@/src/components/UI/MobileNavbar";
 import SideNavbar from "@/src/components/UI/SideNavbar";
 import SuggestionBar from "@/src/components/UI/Suggestionbar";
+import TopMenu from "@/src/components/UI/TopMenu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -42,8 +44,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="fixed w-screen bottom-0 md:hidden h-[5vh] border-t-2 border-gray-300 bg-white">
-            <p>Mobile Navbar</p>
+          <div
+            style={{
+              marginTop: "8vh",
+            }}
+          >
+            <div className="fixed w-screen bottom-0 md:hidden h-[8vh] border-t-2 border-gray-300 bg-white">
+              <MobileNavbar />
+            </div>
+
+            <div className="fixed top-5 right-4 md:hidden z-50">
+              <TopMenu />
+            </div>
           </div>
         </main>
       </div>

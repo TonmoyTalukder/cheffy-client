@@ -15,11 +15,14 @@ import {
   ModalContent,
   useDisclosure,
   Spinner,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { useState, useEffect, useRef } from "react";
-import { FaRegEdit } from "react-icons/fa";
-import { FaShareFromSquare } from "react-icons/fa6";
-import { IoDocumentLockOutline } from "react-icons/io5";
+import { FaRegClock, FaRegEdit } from "react-icons/fa";
+import { IoArrowDown, IoDocumentLockOutline } from "react-icons/io5";
 import Image from "next/image";
 import {
   MdClear,
@@ -28,9 +31,11 @@ import {
   MdOutlineReportProblem,
 } from "react-icons/md";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { BiDownvote, BiUpvote } from "react-icons/bi";
-import { PiPrinterFill } from "react-icons/pi";
+import { PiPrinterFill, PiShareDuotone } from "react-icons/pi";
 import { useReactToPrint } from "react-to-print";
+import { IoMdArrowUp } from "react-icons/io";
+import { BsThreeDots } from "react-icons/bs";
+import Link from "next/link";
 
 import {
   useDeleteComment,
@@ -47,6 +52,8 @@ import { useUser } from "@/src/context/user.provider";
 import { Ingredient, InstructionStep, IRating, IVote } from "@/src/types";
 import UpdateRecipeForm from "@/src/components/post/UpdateRecipeForm";
 import { useGetSingleUser } from "@/src/hooks/user.hooks";
+
+import { timeAgo } from "../feed/RecipeCard";
 
 interface IProps {
   params: {
@@ -465,14 +472,16 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
 
   return (
     <div
-      ref={contentRef}
       style={{
         // marginTop: "5%",
         overflowX: "hidden",
       }}
-      className="flex flex-col items-center w-full p-4 mt-3"
+      className="flex flex-col items-center justify-center w-full p-4 mt-0 gap-2"
     >
-      <Card className="w-full shadow-lg rounded-lg overflow-hidden">
+      <Card
+        ref={contentRef}
+        className="w-full shadow-lg rounded-lg overflow-hidden"
+      >
         <CardHeader className="flex justify-between p-4">
           <div className="flex items-center gap-4">
             <Avatar
@@ -483,41 +492,123 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
               alt="Author Image"
             />
             <div>
-              <h4 className="font-bold text-lg">{recipeData.authorId.name}</h4>
+              <Link href={`/profile/${recipeData.authorId._id}`}>
+                <h4 className="font-bold text-lg hover:underline">
+                  {recipeData.authorId.name}
+                </h4>
+              </Link>
               <p className="text-gray-400 text-sm">
-                {new Date(recipeData.createdAt).toLocaleDateString()}
+                {/* {new Date(recipeData.createdAt).toLocaleDateString()} */}
+                {timeAgo(recipeData.createdAt)}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {isRecipeOwner && (
+            {isRecipeOwner ? (
               <div className="flex flex-row gap-2">
-                <Button
-                  startContent={
-                    <FaRegEdit className="text-yellow-500" size={20} />
-                  }
-                  size="sm"
-                  variant="flat"
-                  onPress={onOpen}
-                />
-                <Button
-                  startContent={
-                    <MdDeleteForever className="text-red-500" size={24} />
-                  }
-                  size="sm"
-                  variant="flat"
-                  onPress={() => handleDelete(recipeData._id, recipeData.title)}
-                />
+                <Dropdown className="ml-auto">
+                  <DropdownTrigger>
+                    <Button
+                      size="sm"
+                      radius="full"
+                      isIconOnly
+                      className="bg-transparent text-gray-500 font-bold ml-auto"
+                    >
+                      <BsThreeDots />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Static Actions" variant="faded">
+                    <DropdownItem key="edit" onPress={onOpen}>
+                      <span className="flex flex-row items-center gap-1 hover:text-blue-500">
+                        <FaRegEdit className="hover:text-blue-500" size={18} />
+                        Edit
+                      </span>
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      onPress={() =>
+                        handleDelete(recipeData._id, recipeData.title)
+                      }
+                    >
+                      <span className="flex flex-row items-center gap-1 hover:text-red-500">
+                        <MdDeleteForever
+                          className="hover:text-red-500"
+                          size={18}
+                        />
+                        Delete
+                      </span>
+                    </DropdownItem>
+                    <DropdownItem key="share" onPress={handleShare}>
+                      <span className="flex flex-row items-center gap-1 hover:text-blue-500">
+                        <PiShareDuotone
+                          className="hover:text-blue-500"
+                          size={18}
+                        />
+                        Share
+                      </span>
+                    </DropdownItem>
+                    <DropdownItem key="print" onPress={() => handlePrint()}>
+                      <span className="flex flex-row items-center gap-1 hover:text-blue-500">
+                        <PiPrinterFill
+                          className="hover:text-blue-500"
+                          size={18}
+                        />
+                        Print
+                      </span>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            ) : (
+              <div className="flex flex-row gap-2">
+                <Dropdown className="ml-auto">
+                  <DropdownTrigger>
+                    <Button
+                      size="sm"
+                      radius="full"
+                      isIconOnly
+                      className="bg-transparent text-gray-500 font-bold ml-auto"
+                    >
+                      <BsThreeDots />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Static Actions" variant="faded">
+                    <DropdownItem key="share" onPress={handleShare}>
+                      <span className="flex flex-row items-center gap-1 hover:text-blue-500">
+                        <PiShareDuotone
+                          className="hover:text-blue-500"
+                          size={18}
+                        />
+                        Share
+                      </span>
+                    </DropdownItem>
+                    <DropdownItem
+                      key="report"
+                      onPress={() =>
+                        handleReport(recipeData._id, recipeData.title)
+                      }
+                    >
+                      <span className="flex flex-row items-center gap-1 hover:text-red-500">
+                        <MdOutlineReportProblem
+                          className="hover:text-red-500"
+                          size={18}
+                        />
+                        Report
+                      </span>
+                    </DropdownItem>
+                    <DropdownItem key="print" onPress={() => handlePrint()}>
+                      <span className="flex flex-row items-center gap-1 hover:text-blue-500">
+                        <PiPrinterFill
+                          className="hover:text-blue-500"
+                          size={18}
+                        />
+                        Print
+                      </span>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </div>
             )}
-            <Button
-              startContent={
-                <FaShareFromSquare className="text-sky-500" size={24} />
-              }
-              size="sm"
-              variant="flat"
-              onPress={handleShare}
-            />
           </div>
         </CardHeader>
 
@@ -563,13 +654,20 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
 
         <CardBody className="px-4 py-6">
           <h1 className="font-bold text-2xl mb-2">{recipeData.title}</h1>
-          <p
-            className={`text-lg font-semibold ${
-              recipeData.diet === "vegan" ? "text-lime-600" : "text-red-500"
-            }`}
-          >
-            {recipeData.diet === "vegan" ? "Vegan" : "Non Veg"}
-          </p>
+          <div className="flex flex-row justify-start items-start gap-4">
+            <p className="text-gray-600 font-bold">
+              {recipeData.diet === "veg" ? (
+                <span className="text-lime-500">Veg</span>
+              ) : recipeData.diet === "vegan" ? (
+                <span className="text-green-500">Vegan</span>
+              ) : (
+                <span className="text-red-500">Non Veg</span>
+              )}
+            </p>
+            <p className="text-gray-600 flex flex-row items-center gap-1">
+              <FaRegClock /> {recipeData.cookingTime} mins
+            </p>
+          </div>
 
           {isPremiumContent ? (
             <Button
@@ -589,12 +687,6 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
 
               <div className="mt-4">
                 <Divider />
-
-                <h2 className="font-bold text-xl mt-4">Cooking Time</h2>
-                <p className="text-gray-600">
-                  {recipeData.cookingTime} minutes
-                </p>
-
                 <h2 className="font-bold text-xl mt-4">Ingredients</h2>
                 <ul className="list-disc list-inside text-gray-600">
                   {recipeData.ingredients.map(
@@ -620,50 +712,6 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
                   )}
                 </ol>
 
-                <Divider />
-                <div className="flex flex-col sm:flex-row items-start gap-4 mt-4">
-                  <div className="flex flex-row gap-2">
-                    <Button
-                      size="sm"
-                      startContent={<BiUpvote />}
-                      variant="flat"
-                      color={userVote === "upvote" ? "primary" : "default"}
-                      onPress={handleUpvote}
-                    >
-                      {upvoteCount}
-                    </Button>
-                    <Button
-                      size="sm"
-                      startContent={<BiDownvote />}
-                      variant="flat"
-                      color={userVote === "downvote" ? "danger" : "default"}
-                      onPress={handleDownvote}
-                    >
-                      {downvoteCount}
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-row items-center justify-between">
-                    <h3 className="text-lg font-semibold">Rating:</h3>
-                    <div className="ml-2 flex items-center">
-                      {renderRatingStars(userRating || 0)}
-                    </div>
-                    <p className="ml-4">
-                      {averageRating.toFixed(1)} ({ratingCount} ratings)
-                    </p>
-                    <div className="ml-2">
-                      {userRating && (
-                        <MdClear
-                          onClick={() => handleRatingUpdate(0)}
-                          className="text-red-500 cursor-pointer"
-                          size={24}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* <h2 className="font-bold text-xl mt-4">Tags</h2> */}
                 <div className="flex flex-wrap gap-2 mt-2">
                   {recipeData.tags.map((tag: string, idx: number) => (
                     <div
@@ -676,167 +724,83 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </>
+          )}
+          <Divider className="my-4" />
+          <div className="flex flex-col sm:flex-row items-start gap-4 mt-4">
+            <div className="flex flex-row gap-1 items-center">
+              <Button
+                size="sm"
+                startContent={<IoMdArrowUp />}
+                variant="flat"
+                color={userVote === "upvote" ? "primary" : "default"}
+                // className="bg-transparent"
+                onPress={handleUpvote}
+              >
+                {upvoteCount}
+              </Button>
+              <Button
+                size="sm"
+                startContent={<IoArrowDown />}
+                variant="flat"
+                color={userVote === "downvote" ? "danger" : "default"}
+                // className="bg-transparent"
+                onPress={handleDownvote}
+              >
+                {downvoteCount}
+              </Button>
+              <div className="ml-2 flex items-center">
+                {renderRatingStars(userRating || 0)}
+                <p className="ml-4">
+                  {averageRating.toFixed(1)} ({ratingCount} ratings)
+                </p>
+              </div>
 
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    startContent={<PiPrinterFill size={24} />}
-                    variant="flat"
-                    color="default"
-                    onClick={
-                      handlePrint as unknown as React.MouseEventHandler<HTMLButtonElement>
-                    }
+              <div className="ml-2">
+                {userRating && (
+                  <MdClear
+                    onClick={() => handleRatingUpdate(0)}
+                    className="text-red-500 cursor-pointer"
+                    size={24}
                   />
-                  {!isRecipeOwner && (
-                    <Button
-                      startContent={
-                        <MdOutlineReportProblem
-                          className="text-red-500"
-                          size={24}
-                        />
-                      }
-                      size="sm"
-                      variant="flat"
-                      onPress={() =>
-                        handleReport(recipeData._id, recipeData.title)
-                      }
-                    />
-                  )}
-                </div>
-
-                <Divider className="my-4" />
-                <div className="my-4">
-                  <h2 className="font-bold text-xl">Comments</h2>
-                  {commentsData?.map((comment) => (
-                    <div
-                      key={comment._id}
-                      className="flex flex-col mt-4 w-full"
-                    >
-                      <div className="flex items-start gap-4">
-                        <Avatar
-                          key={`avatar-${comment._id}`} // Add unique key here
-                          src={comment.authorId.displayPicture}
-                          alt={comment.authorId.name}
-                          size="lg"
-                          isBordered
-                          radius="full"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <strong className="text-lg">
-                                {comment.authorId.name}
-                              </strong>
-                              <p className="text-sm text-gray-500">
-                                {new Date(
-                                  comment.createdAt,
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                            {loggedUser?._id === comment.authorId._id && (
-                              <div className="flex gap-2">
-                                <Button
-                                  key={`edit-btn-${comment._id}`} // Add unique key here
-                                  size="sm"
-                                  variant="flat"
-                                  startContent={
-                                    <MdEdit
-                                      className="text-blue-500"
-                                      size={20}
-                                    />
-                                  }
-                                  onPress={() =>
-                                    handleCommentEdit(
-                                      comment._id,
-                                      comment.content,
-                                    )
-                                  }
-                                />
-                                <Button
-                                  key={`delete-btn-${comment._id}`} // Add unique key here
-                                  size="sm"
-                                  variant="flat"
-                                  startContent={
-                                    <MdDeleteForever
-                                      className="text-red-500"
-                                      size={20}
-                                    />
-                                  }
-                                  onPress={() =>
-                                    handleCommentDelete(comment._id)
-                                  }
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {editingCommentId === comment._id ? (
-                            <div className="mt-2">
-                              <Textarea
-                                key={`textarea-${comment._id}`} // Add unique key here
-                                value={editedContent}
-                                onChange={(e) =>
-                                  setEditedContent(e.target.value)
-                                }
-                                placeholder="Edit your comment"
-                                minRows={2}
-                                maxRows={4}
-                                className="mb-2"
-                              />
-                              <Button
-                                key={`save-btn-${comment._id}`} // Add unique key here
-                                className="mr-2"
-                                variant="solid"
-                                color="primary"
-                                onPress={() =>
-                                  handleCommentSaveEdit(comment._id)
-                                }
-                              >
-                                Save
-                              </Button>
-                              <Button
-                                key={`cancel-btn-${comment._id}`} // Add unique key here
-                                variant="light"
-                                color="danger"
-                                onPress={() => setEditingCommentId(null)}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          ) : (
-                            <p className="text-gray-600 mt-2">
-                              {comment.content}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <Divider className="my-2" />
-                    </div>
-                  ))}
-                </div>
-                <Divider className="my-4" />
-                {/* <h2 className="font-bold text-xl">Comments</h2>
-                {recipeData.comments.map((comment: IComment, idx: number) => (
-                  <div key={idx} className="mt-2">
-                    <strong>{comment.authorId.name}</strong>
-                    <p className="text-gray-600">{comment.content}</p>
-                    <Divider />
-                  </div>
-                ))} */}
-                <Textarea
-                  placeholder="Write your comment..."
-                  value={content}
-                  onChange={(e) => {
-                    setContent(e.target.value);
-                    // setTimeout(() => {
-                    //   window.location.reload(); // Reload the window after 1 second
-                    // }, 1000);
-                  }}
-                  className="mb-2"
-                />
+                )}
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+      <Card className="w-full shadow-lg rounded-lg overflow-hidden">
+        <CardBody className="px-4 py-6">
+          <div className="flex items-start justify-start gap-4 bg-white">
+            <img
+              src={
+                loggedUser?.displayPicture ||
+                "https://i.ibb.co.com/wcv1QBQ/5951752.png"
+              }
+              alt="user avatar"
+              className="w-12 h-12 rounded-full"
+            />
+            <div
+              style={{
+                marginLeft: "-1vw",
+                paddingTop: "1vh",
+                paddingBottom: "1vh",
+              }}
+              className="w-full"
+            >
+              <p className="text-lg font-bold ml-2">{loggedUser?.name}</p>
+              <input
+                className="w-full p-2 text-lg border-none rounded-full focus:ring-2 focus:ring-transparent focus:outline-none"
+                placeholder="What's on your mind?"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+              <div className="flex justify-end w-full">
                 <Button
                   className="mt-2"
                   variant="solid"
+                  radius="full"
                   onPress={() => {
                     handleAddComment();
                     setTimeout(() => {
@@ -844,11 +808,129 @@ const SingleRecipe = ({ params: { recipeId } }: IProps) => {
                     }, 500);
                   }}
                 >
-                  Add Comment
+                  Comment
                 </Button>
               </div>
-            </>
-          )}
+            </div>
+          </div>
+          <Divider className="my-4" />
+          <div className="my-4">
+            {commentsData?.length! > 0 && (
+              <h2 className="font-bold text-xl">
+                Comments ({commentsData?.length})
+              </h2>
+            )}
+            {commentsData?.map((comment) => (
+              <div key={comment._id} className="flex flex-col mt-4 w-full">
+                <div className="flex items-start gap-4">
+                  <Avatar
+                    key={`avatar-${comment._id}`} // Add unique key here
+                    src={comment.authorId.displayPicture}
+                    alt={comment.authorId.name}
+                    size="lg"
+                    isBordered
+                    radius="full"
+                  />
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <strong className="text-lg">
+                          {comment.authorId.name}
+                        </strong>
+                        <p className="text-sm text-gray-500">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {loggedUser?._id === comment.authorId._id && (
+                        <div className="flex gap-2">
+                          <Button
+                            key={`edit-btn-${comment._id}`} // Add unique key here
+                            size="sm"
+                            variant="flat"
+                            startContent={
+                              <MdEdit className="text-blue-500" size={20} />
+                            }
+                            onPress={() =>
+                              handleCommentEdit(comment._id, comment.content)
+                            }
+                          />
+                          <Button
+                            key={`delete-btn-${comment._id}`} // Add unique key here
+                            size="sm"
+                            variant="flat"
+                            startContent={
+                              <MdDeleteForever
+                                className="text-red-500"
+                                size={20}
+                              />
+                            }
+                            onPress={() => handleCommentDelete(comment._id)}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {editingCommentId === comment._id ? (
+                      <div className="mt-2">
+                        <Textarea
+                          key={`textarea-${comment._id}`} // Add unique key here
+                          value={editedContent}
+                          onChange={(e) => setEditedContent(e.target.value)}
+                          placeholder="Edit your comment"
+                          minRows={2}
+                          maxRows={4}
+                          className="mb-2"
+                        />
+                        <Button
+                          key={`save-btn-${comment._id}`} // Add unique key here
+                          className="mr-2"
+                          variant="solid"
+                          color="primary"
+                          onPress={() => handleCommentSaveEdit(comment._id)}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          key={`cancel-btn-${comment._id}`} // Add unique key here
+                          variant="light"
+                          color="danger"
+                          onPress={() => setEditingCommentId(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-gray-600 mt-2">{comment.content}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* <Textarea
+            placeholder="Write your comment..."
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+              // setTimeout(() => {
+              //   window.location.reload(); // Reload the window after 1 second
+              // }, 1000);
+            }}
+            className="mb-2"
+          />
+          <Button
+            className="mt-2"
+            variant="solid"
+            onPress={() => {
+              handleAddComment();
+              setTimeout(() => {
+                window.location.reload(); // Reload the window after 1 second
+              }, 500);
+            }}
+          >
+            Add Comment
+          </Button> */}
         </CardBody>
       </Card>
     </div>

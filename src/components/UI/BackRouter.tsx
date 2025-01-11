@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useUser } from '@/src/context/user.provider';
-import { GoArrowLeft } from 'react-icons/go';
-import { useRouter } from 'next/navigation';
+import { GoArrowLeft } from "react-icons/go";
+import { useRouter } from "next/navigation";
+
+import { useUser } from "@/src/context/user.provider";
 
 const BackRouter = () => {
   const { user } = useUser();
@@ -20,7 +21,7 @@ const BackRouter = () => {
     >
       <GoArrowLeft
         style={{
-          fontWeight: 'bold',
+          fontWeight: "bold",
           strokeWidth: 1.2,
         }}
       />

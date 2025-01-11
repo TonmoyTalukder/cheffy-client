@@ -1,27 +1,5 @@
-import {
-  Button,
-  Card,
-  Divider,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Avatar,
-  useDisclosure,
-  Modal,
-  ModalContent,
-  ModalBody,
-  ModalFooter,
-  Spinner,
-} from "@nextui-org/react";
-import Image from "next/image";
+import { useDisclosure, Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { BiUpvote, BiDownvote } from "react-icons/bi";
-import { FaShareFromSquare } from "react-icons/fa6";
-import { PiSealCheckFill } from "react-icons/pi";
-import { FaRegEdit } from "react-icons/fa";
-import { IoDocumentLockOutline } from "react-icons/io5";
-import { MdDeleteForever } from "react-icons/md";
-import { Link } from "@nextui-org/react";
 
 import { useUser } from "@/src/context/user.provider";
 import {
@@ -38,9 +16,7 @@ import {
 } from "@/src/types";
 import { useGetSingleUser } from "@/src/hooks/user.hooks";
 
-import PremiumModal from "../modal/PremiumModal";
-
-import UpdateRecipeForm from "./UpdateRecipeForm";
+import RecipeCard from "../feed/RecipeCard";
 
 export interface IAuthor {
   _id: string;
@@ -228,208 +204,209 @@ const UserRecipePost: React.FC<UserRecipePostProps> = ({ profileId }) => {
         <p className="text-gray-500 mt-2">No posts yet.</p>
       )}
       {filteredRecipes.map((recipe: RecipeInterface) => (
-        <Card
-          key={recipe._id}
-          className="w-full shadow-lg transition-transform transform hover:scale-105 rounded-lg overflow-hidden my-4"
-        >
-          {/* Card Header with Author Info */}
+        // <Card
+        //   key={recipe._id}
+        //   className="w-full shadow-lg transition-transform transform hover:scale-105 rounded-lg overflow-hidden my-4"
+        // >
+        //   {/* Card Header with Author Info */}
 
-          <CardHeader className="flex justify-between p-4">
-            <Link
-              href={`${window.location.origin}/recipe/${recipe._id}`}
-              color="foreground"
-              className="flex justify-between w-full"
-            >
-              <div className="flex items-center gap-4 w-max">
-                <Avatar
-                  isBordered
-                  radius="full"
-                  size="lg"
-                  src={recipe.authorId.displayPicture}
-                  alt="Author Image"
-                />
-                <div>
-                  <h4 className="font-bold text-lg flex flex-row">
-                    {recipe.authorId.name}{" "}
-                    {recipe.authorId?.isPremium && <PiSealCheckFill />}
-                  </h4>
-                  <p className="text-gray-400 text-sm">
-                    {new Date(recipe.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </Link>
-            {/* Place the button outside of the link */}
-            {recipeOwner && (
-              <Button
-                startContent={
-                  <MdDeleteForever className="text-red-500" size={24} />
-                }
-                size="sm"
-                variant="flat"
-                onPress={() => handleDelete(recipe._id, recipe.title)}
-              />
-            )}
-          </CardHeader>
+        //   <CardHeader className="flex justify-between p-4">
+        //     <Link
+        //       href={`${window.location.origin}/recipe/${recipe._id}`}
+        //       color="foreground"
+        //       className="flex justify-between w-full"
+        //     >
+        //       <div className="flex items-center gap-4 w-max">
+        //         <Avatar
+        //           isBordered
+        //           radius="full"
+        //           size="lg"
+        //           src={recipe.authorId.displayPicture}
+        //           alt="Author Image"
+        //         />
+        //         <div>
+        //           <h4 className="font-bold text-lg flex flex-row">
+        //             {recipe.authorId.name}{" "}
+        //             {recipe.authorId?.isPremium && <PiSealCheckFill />}
+        //           </h4>
+        //           <p className="text-gray-400 text-sm">
+        //             {new Date(recipe.createdAt).toLocaleDateString()}
+        //           </p>
+        //         </div>
+        //       </div>
+        //     </Link>
+        //     {/* Place the button outside of the link */}
+        //     {recipeOwner && (
+        //       <Button
+        //         startContent={
+        //           <MdDeleteForever className="text-red-500" size={24} />
+        //         }
+        //         size="sm"
+        //         variant="flat"
+        //         onPress={() => handleDelete(recipe._id, recipe.title)}
+        //       />
+        //     )}
+        //   </CardHeader>
 
-          {/* Recipe Image with fixed height and cropping */}
-          <div className="relative w-full h-56 overflow-hidden">
-            <Image
-              src={recipe.image}
-              alt={recipe.title}
-              fill
-              style={{ objectFit: "cover" }}
-              className="w-full h-full object-cover"
-            />
-          </div>
+        //   {/* Recipe Image with fixed height and cropping */}
+        //   <div className="relative w-full h-56 overflow-hidden">
+        //     <Image
+        //       src={recipe.image}
+        //       alt={recipe.title}
+        //       fill
+        //       style={{ objectFit: "cover" }}
+        //       className="w-full h-full object-cover"
+        //     />
+        //   </div>
 
-          {/* Card Body with Recipe Info */}
-          <CardBody className="px-4 py-2">
-            <Link
-              href={`${window.location.origin}/recipe/${recipe._id}`}
-              underline="hover"
-              color="foreground"
-            >
-              <h1 className="font-bold text-xl">{recipe.title}</h1>{" "}
-            </Link>
-            {recipe.diet === "veg" ? (
-              <p className="text-green-600">Veg</p>
-            ) : recipe.diet === "vegan" ? (
-              <p className="text-lime-600">Vegan</p>
-            ) : (
-              <p className="text-red-500">Non Veg</p>
-            )}
-            <div className="text-gray-500 mt-2">
-              {expandedRecipe === recipe._id ? (
-                <div
-                  //   className="text-gray-500"
-                  style={{ color: "gray" }}
-                  dangerouslySetInnerHTML={{ __html: recipe.description }}
-                />
-              ) : (
-                `${stripHtmlTags(recipe.description).substring(0, 100)}...`
-              )}
-            </div>
-            {!loggedUser?.isPremium && recipe.premium ? (
-              <Button
-                startContent={<IoDocumentLockOutline size={18} />}
-                onPress={() => setIsPremiumModalOpen(true)}
-                className="mt-2 bg-amber-400"
-                size="sm"
-              >
-                Premium Recipe
-              </Button>
-            ) : (
-              <Button
-                color="primary"
-                onPress={() => toggleReadMore(recipe._id)}
-                className="mt-2"
-                size="sm"
-              >
-                {expandedRecipe === recipe._id ? "Show Less" : "Read More"}
-              </Button>
-            )}
+        //   {/* Card Body with Recipe Info */}
+        //   <CardBody className="px-4 py-2">
+        //     <Link
+        //       href={`${window.location.origin}/recipe/${recipe._id}`}
+        //       underline="hover"
+        //       color="foreground"
+        //     >
+        //       <h1 className="font-bold text-xl">{recipe.title}</h1>{" "}
+        //     </Link>
+        //     {recipe.diet === "veg" ? (
+        //       <p className="text-green-600">Veg</p>
+        //     ) : recipe.diet === "vegan" ? (
+        //       <p className="text-lime-600">Vegan</p>
+        //     ) : (
+        //       <p className="text-red-500">Non Veg</p>
+        //     )}
+        //     <div className="text-gray-500 mt-2">
+        //       {expandedRecipe === recipe._id ? (
+        //         <div
+        //           //   className="text-gray-500"
+        //           style={{ color: "gray" }}
+        //           dangerouslySetInnerHTML={{ __html: recipe.description }}
+        //         />
+        //       ) : (
+        //         `${stripHtmlTags(recipe.description).substring(0, 100)}...`
+        //       )}
+        //     </div>
+        //     {!loggedUser?.isPremium && recipe.premium ? (
+        //       <Button
+        //         startContent={<IoDocumentLockOutline size={18} />}
+        //         onPress={() => setIsPremiumModalOpen(true)}
+        //         className="mt-2 bg-amber-400"
+        //         size="sm"
+        //       >
+        //         Premium Recipe
+        //       </Button>
+        //     ) : (
+        //       <Button
+        //         color="primary"
+        //         onPress={() => toggleReadMore(recipe._id)}
+        //         className="mt-2"
+        //         size="sm"
+        //       >
+        //         {expandedRecipe === recipe._id ? "Show Less" : "Read More"}
+        //       </Button>
+        //     )}
 
-            {loggedUser && (
-              <PremiumModal
-                isOpen={isPremiumModalOpen}
-                onClose={() => setIsPremiumModalOpen(false)}
-                user={loggedUser}
-              />
-            )}
+        //     {loggedUser && (
+        //       <PremiumModal
+        //         isOpen={isPremiumModalOpen}
+        //         onClose={() => setIsPremiumModalOpen(false)}
+        //         user={loggedUser}
+        //       />
+        //     )}
 
-            {expandedRecipe === recipe._id && (
-              <div className="mt-4">
-                <Divider />
-                <h1 className="text-gray-600 mt-2">
-                  Cooking Time: {recipe.cookingTime} mins
-                </h1>
-                <h1 className="text-gray-600">Ingredients:</h1>
-                <ul className="list-disc list-inside">
-                  {recipe.ingredients.map((ingredient, idx) => (
-                    <li key={idx}>
-                      {ingredient.name} - {ingredient.amount}
-                    </li>
-                  ))}
-                </ul>
-                <h1 className="text-gray-600 mt-2">Instructions:</h1>
-                <ol className="list-decimal list-inside">
-                  {recipe.instructions.map((instruction, idx) => (
-                    <li key={idx}>{stripHtmlTags(instruction.details)}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </CardBody>
+        //     {expandedRecipe === recipe._id && (
+        //       <div className="mt-4">
+        //         <Divider />
+        //         <h1 className="text-gray-600 mt-2">
+        //           Cooking Time: {recipe.cookingTime} mins
+        //         </h1>
+        //         <h1 className="text-gray-600">Ingredients:</h1>
+        //         <ul className="list-disc list-inside">
+        //           {recipe.ingredients.map((ingredient, idx) => (
+        //             <li key={idx}>
+        //               {ingredient.name} - {ingredient.amount}
+        //             </li>
+        //           ))}
+        //         </ul>
+        //         <h1 className="text-gray-600 mt-2">Instructions:</h1>
+        //         <ol className="list-decimal list-inside">
+        //           {recipe.instructions.map((instruction, idx) => (
+        //             <li key={idx}>{stripHtmlTags(instruction.details)}</li>
+        //           ))}
+        //         </ol>
+        //       </div>
+        //     )}
+        //   </CardBody>
 
-          {/* Card Footer with Upvotes, Downvotes and Date */}
-          <CardFooter className="flex justify-between p-4">
-            <div className="flex items-center gap-4">
-              <Button
-                startContent={<BiUpvote className="text-green-500" size={24} />}
-                size="sm"
-                variant="flat"
-                onPress={() => handleVote(recipe._id, "upvote")}
-              >
-                {getVoteCounts(recipe).upvoteCount}
-              </Button>
-              <Button
-                startContent={<BiDownvote className="text-red-500" size={24} />}
-                size="sm"
-                variant="flat"
-                onPress={() => handleVote(recipe._id, "downvote")}
-              >
-                {getVoteCounts(recipe).downvoteCount}
-              </Button>
-            </div>
-            <div className="flex items-center gap-4">
-              {recipeOwner && (
-                <Button
-                  startContent={
-                    <FaRegEdit className="text-yellow-500" size={24} />
-                  }
-                  size="sm"
-                  variant="flat"
-                  onPress={onOpen}
-                />
-              )}
-              <Button
-                startContent={
-                  <FaShareFromSquare className="text-sky-500" size={24} />
-                }
-                size="sm"
-                variant="flat"
-                onPress={() => handleShare(recipe)}
-              />
-            </div>
-          </CardFooter>
-          {/* Modal for editing recipe */}
-          <Modal
-            backdrop={"blur"}
-            isOpen={isOpen}
-            scrollBehavior={"outside"}
-            onOpenChange={onOpenChange}
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  {/* <ModalHeader className="flex flex-col gap-1"></ModalHeader> */}
-                  <ModalBody>
-                    <UpdateRecipeForm
-                      recipe={{ ...recipe, authorId: recipe.authorId._id }}
-                      recipeId={recipe._id}
-                    />
-                  </ModalBody>
-                  <ModalFooter className="flex justify-center items-center w-full">
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
-        </Card>
+        //   {/* Card Footer with Upvotes, Downvotes and Date */}
+        //   <CardFooter className="flex justify-between p-4">
+        //     <div className="flex items-center gap-4">
+        //       <Button
+        //         startContent={<BiUpvote className="text-green-500" size={24} />}
+        //         size="sm"
+        //         variant="flat"
+        //         onPress={() => handleVote(recipe._id, "upvote")}
+        //       >
+        //         {getVoteCounts(recipe).upvoteCount}
+        //       </Button>
+        //       <Button
+        //         startContent={<BiDownvote className="text-red-500" size={24} />}
+        //         size="sm"
+        //         variant="flat"
+        //         onPress={() => handleVote(recipe._id, "downvote")}
+        //       >
+        //         {getVoteCounts(recipe).downvoteCount}
+        //       </Button>
+        //     </div>
+        //     <div className="flex items-center gap-4">
+        //       {recipeOwner && (
+        //         <Button
+        //           startContent={
+        //             <FaRegEdit className="text-yellow-500" size={24} />
+        //           }
+        //           size="sm"
+        //           variant="flat"
+        //           onPress={onOpen}
+        //         />
+        //       )}
+        //       <Button
+        //         startContent={
+        //           <FaShareFromSquare className="text-sky-500" size={24} />
+        //         }
+        //         size="sm"
+        //         variant="flat"
+        //         onPress={() => handleShare(recipe)}
+        //       />
+        //     </div>
+        //   </CardFooter>
+        //   {/* Modal for editing recipe */}
+        //   <Modal
+        //     backdrop={"blur"}
+        //     isOpen={isOpen}
+        //     scrollBehavior={"outside"}
+        //     onOpenChange={onOpenChange}
+        //   >
+        //     <ModalContent>
+        //       {(onClose) => (
+        //         <>
+        //           {/* <ModalHeader className="flex flex-col gap-1"></ModalHeader> */}
+        //           <ModalBody>
+        //             <UpdateRecipeForm
+        //               recipe={{ ...recipe, authorId: recipe.authorId._id }}
+        //               recipeId={recipe._id}
+        //             />
+        //           </ModalBody>
+        //           <ModalFooter className="flex justify-center items-center w-full">
+        //             <Button color="danger" variant="light" onPress={onClose}>
+        //               Close
+        //             </Button>
+        //           </ModalFooter>
+        //         </>
+        //       )}
+        //     </ModalContent>
+        //   </Modal>
+        // </Card>
+        <RecipeCard key={`${recipe._id}`} recipe={recipe} />
       ))}
     </div>
   );

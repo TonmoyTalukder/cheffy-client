@@ -9,6 +9,7 @@ import { Input } from "@nextui-org/input";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { NextPage } from "next";
+import Image from "next/image";
 
 import CFForm from "@/src/components/form/CFForm";
 import CFInput from "@/src/components/form/CFInput";
@@ -200,7 +201,16 @@ const SignUpPage: NextPage = () => {
   return (
     <div className="w-full">
       <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center">
-        <h3 className="my-2 text-2xl font-bold">Sign Up</h3>
+        <div className="flex items-center gap-2">
+          <Image
+            alt="Logo"
+            height={Number(50)}
+            src="/cheffy.svg"
+            width={Number(50)}
+          />
+          <p className="font-bold text-inherit text-4xl">Cheffy</p>
+        </div>
+        <h3 className="my-2 text-xl font-bold">Sign Up</h3>
         <p className="mb-4">Create your account in a few steps</p>
         <div className="w-[75%] md:w-[55%] lg:w-[35%]">
           <CFForm onSubmit={onSubmit}>

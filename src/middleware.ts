@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/src/services/AuthService";
 
 const AuthRoutes = ["/login", "/signup"];
 const AdminRoutes = ["/admin-dashboard", "/admin-recipe", "/admin-user"];
-const SharedRoutes = ["/profile", "/recipe"];
+const SharedRoutes = ["/profile", "/recipe", "/settings"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

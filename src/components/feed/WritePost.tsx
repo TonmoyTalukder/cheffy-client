@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { Button } from '@nextui-org/button';
-import { HiOutlinePhotograph } from 'react-icons/hi';
-import { CiCircleList } from 'react-icons/ci';
-import { GiNotebook } from 'react-icons/gi';
-import { FaRegClock, FaHashtag } from 'react-icons/fa';
-import { LuVegan } from 'react-icons/lu';
-import { AiOutlineStar } from 'react-icons/ai';
-import { BsDot } from 'react-icons/bs';
-import { IoMdAdd } from 'react-icons/io';
-import { useEffect, useRef, useState } from 'react';
+import { Button } from "@nextui-org/button";
+import { HiOutlinePhotograph } from "react-icons/hi";
+import { CiCircleList } from "react-icons/ci";
+import { GiNotebook } from "react-icons/gi";
+import { FaRegClock, FaHashtag } from "react-icons/fa";
+import { LuVegan } from "react-icons/lu";
+import { AiOutlineStar } from "react-icons/ai";
+import { BsDot } from "react-icons/bs";
+import { IoMdAdd } from "react-icons/io";
+import { useEffect, useRef, useState } from "react";
+import { FiX } from "react-icons/fi";
+import { Input } from "@nextui-org/input";
+import { Select, SelectItem } from "@nextui-org/react";
 
-import { useUser } from '@/src/context/user.provider';
+import { Ingredient, InstructionStep, IRecipe } from "@/src/types";
+import { useUser } from "@/src/context/user.provider";
+import { useCreatePost } from "@/src/hooks/post.hooks";
+import { uploadImageFile } from "@/src/utils/uploadImage";
 
-import RichTextEditor from '../post/RichTextEditor';
-import { FiX } from 'react-icons/fi';
-import { Ingredient, InstructionStep, IRecipe } from '@/src/types';
-import { Input } from '@nextui-org/input';
-import { Select, SelectItem } from '@nextui-org/react';
-import { useCreatePost } from '@/src/hooks/post.hooks';
-import { uploadImageFile } from '@/src/utils/uploadImage';
+import RichTextEditor from "../post/RichTextEditor";
 
-const hash = '#';
+const hash = "#";
 
 const WritePost = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -30,22 +30,22 @@ const WritePost = () => {
   const [isAddCookingTime, setIsAddCookingTime] = useState(false);
   const [isAddDiet, setIsAddDiet] = useState(false);
   const [isAddTag, setIsAddTag] = useState(false);
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [newIngredient, setNewIngredient] = useState<Ingredient>({
-    name: '',
-    amount: '',
+    name: "",
+    amount: "",
   });
   const [instructions, setInstructions] = useState<InstructionStep[]>([]);
-  const [newInstruction, setNewInstruction] = useState<string>('');
+  const [newInstruction, setNewInstruction] = useState<string>("");
   const [cookingTime, setCookingTime] = useState<number>(0);
   const [instructionTime, setInstructionTime] = useState<number>(0);
   const [diet, setDiet] = useState<Set<string>>(new Set());
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState<string>('');
+  const [newTag, setNewTag] = useState<string>("");
   const [isPremium, setIsPremium] = useState<boolean>(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -56,7 +56,7 @@ const WritePost = () => {
   const { user, isLoading } = useUser();
   const profileId = user?._id;
   const avatarUrl =
-    user?.displayPicture || 'https://i.ibb.co.com/wcv1QBQ/5951752.png';
+    user?.displayPicture || "https://i.ibb.co.com/wcv1QBQ/5951752.png";
 
   const handleImageButtonClick = () => {
     setIsEditing(true);
@@ -70,8 +70,9 @@ const WritePost = () => {
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
+
     if (file) {
-      console.log('File uploaded:', file);
+      console.log("File uploaded:", file);
       setImageFile(file);
       const reader = new FileReader();
 
@@ -85,10 +86,10 @@ const WritePost = () => {
   const clearImage = () => {
     setImageFile(null);
     setImagePreview(null);
-    const fileInput = document.getElementById('image') as HTMLInputElement;
+    const fileInput = document.getElementById("image") as HTMLInputElement;
 
     if (fileInput) {
-      fileInput.value = '';
+      fileInput.value = "";
     }
   };
 
@@ -96,13 +97,14 @@ const WritePost = () => {
   const handleAddIngredient = () => {
     if (newIngredient.name && newIngredient.amount) {
       setIngredients([...ingredients, newIngredient]);
-      setNewIngredient({ name: '', amount: '' });
+      setNewIngredient({ name: "", amount: "" });
       setIsAddingIngredient(false);
     }
   };
 
   const handleDeleteIngredient = (index: number) => {
     const updatedIngredients = ingredients.filter((_, i) => i !== index);
+
     setIngredients(updatedIngredients);
   };
 
@@ -113,7 +115,7 @@ const WritePost = () => {
         ...instructions,
         { details: newInstruction, time: instructionTime },
       ]);
-      setNewInstruction('');
+      setNewInstruction("");
       setInstructionTime(0);
       setIsAddingInstruction(false);
     }
@@ -121,13 +123,16 @@ const WritePost = () => {
 
   const handleDeleteInstruction = (index: number) => {
     const updatedInstructions = instructions.filter((_, i) => i !== index);
+
     setInstructions(updatedInstructions);
   };
 
   const stripHtmlTags = (html: string) => {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
+
     div.innerHTML = html;
-    return div.textContent || div.innerText || '';
+
+    return div.textContent || div.innerText || "";
   };
 
   // Handle adding a tag
@@ -135,8 +140,10 @@ const WritePost = () => {
     if (newTag && !tags.includes(newTag)) {
       setTags((prevTags) => {
         const updatedTags = [...prevTags, newTag];
-        setNewTag('');
+
+        setNewTag("");
         setIsAddTag(false);
+
         return updatedTags;
       });
     }
@@ -148,9 +155,9 @@ const WritePost = () => {
 
   // Diet options
   const diets = [
-    { key: 'veg', label: 'Veg' },
-    { key: 'vegan', label: 'Vegan' },
-    { key: 'non_veg', label: 'Non Veg' },
+    { key: "veg", label: "Veg" },
+    { key: "vegan", label: "Vegan" },
+    { key: "non_veg", label: "Non Veg" },
   ];
 
   // handle premium
@@ -187,20 +194,20 @@ const WritePost = () => {
     if (imageFile) {
       uploadedImageUrl = await uploadImageFile(imageFile);
       if (!uploadedImageUrl) {
-        alert('Image upload failed. Please try again.');
+        alert("Image upload failed. Please try again.");
 
         return;
       }
     }
 
-    const selectedDiet = Array.from(diet).join(', ');
+    const selectedDiet = Array.from(diet).join(", ");
 
-    const newRecipe: Omit<IRecipe, '_id' | 'report'> = {
+    const newRecipe: Omit<IRecipe, "_id" | "report"> = {
       title,
       description,
       ingredients,
       instructions,
-      image: uploadedImageUrl || '',
+      image: uploadedImageUrl || "",
       cookingTime,
       ratings: [],
       ratingsCount: 0,
@@ -317,17 +324,17 @@ const WritePost = () => {
             {/* Diet */}
             {diet.size > 0 && (
               <div className="my-2 ml-2 flex items-center gap-1">
-                {diet.has('veg') && (
+                {diet.has("veg") && (
                   <p className="text-green-500 flex flex-row items-center gap-1">
                     <LuVegan className="text-lg" /> Veg
                   </p>
                 )}
-                {diet.has('vegan') && (
+                {diet.has("vegan") && (
                   <p className="text-lime-500 flex flex-row items-center gap-1">
                     <LuVegan className="text-lg" /> Vegan
                   </p>
                 )}
-                {diet.has('non_veg') && (
+                {diet.has("non_veg") && (
                   <p className="text-red-500 flex flex-row items-center gap-1">
                     <LuVegan className="text-lg" /> Non Veg
                   </p>
@@ -372,7 +379,7 @@ const WritePost = () => {
                   className="absolute p-1 rounded-full z-10 bg-transparent"
                   onClick={clearImage}
                   isIconOnly
-                  style={{ top: '-10px', right: '-5px' }} // Adjust the top value as needed
+                  style={{ top: "-10px", right: "-5px" }} // Adjust the top value as needed
                 >
                   <FiX className="text-red-500" size={24} />
                 </Button>
@@ -491,7 +498,7 @@ const WritePost = () => {
                     onChange={(e) => {
                       setNewTag(e.target.value);
                     }}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
                   />
                 </div>
               )}
@@ -512,7 +519,7 @@ const WritePost = () => {
             <input
               type="file"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               accept=".png, .jpeg, .jpg"
               onChange={handleFileChange}
             />

@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useFollowUser, useGetSingleUser } from '@/src/hooks/user.hooks';
-import { Button, Avatar, Spinner } from '@nextui-org/react';
-import Link from 'next/link';
-import { useUser } from '@/src/context/user.provider';
-import { Key, useState, useEffect } from 'react';
+import { Button, Avatar, Spinner } from "@nextui-org/react";
+import Link from "next/link";
+import { Key, useState, useEffect } from "react";
+
+import { useUser } from "@/src/context/user.provider";
+import { useFollowUser, useGetSingleUser } from "@/src/hooks/user.hooks";
 
 interface IProps {
   params: {
@@ -33,6 +34,7 @@ const FollowingsPage = ({ params: { profileId } }: IProps) => {
     if (visitorUser && followingId === visitorUser?._id) {
       return true;
     }
+
     return false;
   };
 
@@ -41,10 +43,12 @@ const FollowingsPage = ({ params: { profileId } }: IProps) => {
       const initialFollowStates = user.followers.reduce(
         (acc: Record<string, boolean>, follower: Following) => {
           acc[follower.id] = checkIfFollowsYou(follower.id);
+
           return acc;
         },
         {},
       );
+
       setFollowStates(initialFollowStates);
     }
   }, [user?.followers, visitorUser]);

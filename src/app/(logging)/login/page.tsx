@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   useDisclosure,
@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-// import { toast } from "sonner";
+import Image from "next/image";
 
 import CFInput from "@/src/components/form/CFInput";
 import CFForm from "@/src/components/form/CFForm";
@@ -21,6 +21,9 @@ import { useUserLogin } from "@/src/hooks/auth.hooks";
 import { useUser } from "@/src/context/user.provider";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const { setIsLoading: userLoading } = useUser();
   const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
   const searchParams = useSearchParams();
@@ -29,35 +32,15 @@ export default function LoginPage() {
   const status = searchParams.get("status");
   const { isOpen: isBlockedModalOpen, onOpen, onClose } = useDisclosure();
 
-  // useEffect(() => {
-  //   if (isPending) {
-  //     toast("Logging..."); // Display toast notification when pending
-  //   }
-  //   if (isSuccess) {
-  //     toast.dismiss(); // Dismiss toast when success
-  //   }
-  // }, [isPending, isSuccess]);
-
   useEffect(() => {
     if (status === "blocked") {
       onOpen();
     }
   }, [status, onOpen]);
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    handleUserLogin(data);
+  const onSubmit: SubmitHandler<FieldValues> = () => {
+    handleUserLogin({ email, password });
     userLoading(true);
-
-    // , {
-    //   onError: (err) => {
-    //     if (
-    //       err?.message ===
-    //       "Error: AxiosError: Request failed with status code 403"
-    //     ) {
-    //       onOpen();
-    //     }
-    //   },
-    // }
   };
 
   useEffect(() => {
@@ -70,18 +53,64 @@ export default function LoginPage() {
     }
   }, [isPending, isSuccess, redirect, router]);
 
+  const handleTestCredentials = (role: string) => {
+    if (role === "admin") {
+      setEmail("admin@mail.com");
+      setPassword("123456");
+    } else {
+      setEmail("akshay@kumar.com");
+      setPassword("123456");
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center">
-        <h3 className="my-2 text-2xl font-bold">Login</h3>
+        <div className="flex items-center gap-2">
+          <Image
+            alt="Logo"
+            height={Number(50)}
+            src="/cheffy.svg"
+            width={Number(50)}
+          />
+          <p className="font-bold text-inherit text-4xl">Cheffy</p>
+        </div>
+        <h3 className="my-2 text-xl font-bold">Login</h3>
         <p className="mb-4">Welcome Back! Let&lsquo;s Get Started</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button
+            className="bg-zinc-600 hover:bg-zinc-500 text-white"
+            onPress={() => handleTestCredentials("admin")}
+          >
+            Admin
+          </Button>
+
+          <Button
+            className="bg-zinc-600 hover:bg-zinc-500 text-white"
+            onPress={() => handleTestCredentials("user")}
+          >
+            User
+          </Button>
+        </div>
         <div className="w-[75%] md:w-[55%] lg:w-[35%]">
           <CFForm onSubmit={onSubmit}>
             <div className="py-3">
-              <CFInput label="Email" name="email" type="email" />
+              <CFInput
+                label="Email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="py-3">
-              <CFInput label="Password" name="password" type="password" />
+              <CFInput
+                label="Password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button
               className="my-3 w-full rounded-md bg-default-900 font-semibold text-default"
@@ -105,21 +134,6 @@ export default function LoginPage() {
                 href={"/signup"}
               >
                 Sign Up
-              </Link>
-            </div>
-
-            <div className="my-4 gap-2 flex flex-row items-center justify-center">
-              <Link
-                className="text-[#daa611] hover:text-[#a58a40] underline"
-                href={"/about-us"}
-              >
-                About Us
-              </Link>
-              <Link
-                className="text-[#daa611] hover:text-[#a58a40] underline"
-                href={"/contact-us"}
-              >
-                Contact Us
               </Link>
             </div>
           </div>

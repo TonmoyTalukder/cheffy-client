@@ -1,53 +1,44 @@
 /* eslint-disable no-console */
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   Spinner,
   useDisclosure,
-} from '@nextui-org/react';
-import Image from 'next/image';
-import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
-import { toast } from 'sonner';
-import { PiSealCheckFill } from 'react-icons/pi';
-import Link from 'next/link';
-import axios from 'axios';
-import { FaEdit } from 'react-icons/fa';
+} from "@nextui-org/react";
+import Image from "next/image";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
+import { PiSealCheckFill } from "react-icons/pi";
+import Link from "next/link";
+import axios from "axios";
 import {
   MdOutlineAdminPanelSettings,
   MdOutlineReportProblem,
-} from 'react-icons/md';
-import { useRouter } from 'next/navigation';
+} from "react-icons/md";
+import { useRouter } from "next/navigation";
+import { SlLocationPin } from "react-icons/sl";
+import { LuVegan } from "react-icons/lu";
+import { BsThreeDots } from "react-icons/bs";
 
-import { IUser, TFollowUser } from '@/src/types';
+import { IUser, TFollowUser } from "@/src/types";
 import {
   useFollowUser,
   useGetSingleUser,
   usePremiumPayment,
   useReportUser,
   useUpdateUser,
-} from '@/src/hooks/user.hooks';
-import EditProfileModal from '@/src/components/modal/EditProfileModal';
-import envConfig from '@/src/config/envConfig';
-import RecipePostForm from '@/src/components/post/RecipePostForm';
-import UserRecipePost from '@/src/components/post/UserRecipePost';
-import About from '@/src/components/profile/About';
-import WritePost from '@/src/components/feed/WritePost';
-import { SlLocationPin } from 'react-icons/sl';
-import { LuVegan } from 'react-icons/lu';
-import { BsThreeDots } from 'react-icons/bs';
+} from "@/src/hooks/user.hooks";
+import EditProfileModal from "@/src/components/modal/EditProfileModal";
+import envConfig from "@/src/config/envConfig";
+import UserRecipePost from "@/src/components/post/UserRecipePost";
 interface IProps {
   params: {
     profileId: string;
@@ -56,7 +47,8 @@ interface IProps {
 
 const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const { data, isLoading, error, refetch } = useGetSingleUser(profileId);
-  console.log('user data', data);
+
+  console.log("user data", data);
   const {
     // mutate: initiatePayment,
     isPending: premiumPayPending,
@@ -71,9 +63,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !sessionStorage.getItem('reloaded')) {
+    if (typeof window !== "undefined" && !sessionStorage.getItem("reloaded")) {
       // Reload the page and set a flag to avoid infinite loop
-      sessionStorage.setItem('reloaded', 'true');
+      sessionStorage.setItem("reloaded", "true");
       window.location.reload();
     }
   }, []);
@@ -84,18 +76,18 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const [isOwner, setIsOwner] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followsYou, setFollowsYou] = useState(false);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState("posts");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (user && user.role === 'ADMIN') {
-      setActiveTab('about');
+    if (user && user.role === "ADMIN") {
+      setActiveTab("about");
     }
   }, [user]);
 
   // Fetch data for the current visitor
   const [touristId, setTouristId] = useState<string | null>(null);
-  const { data: currentUserData } = useGetSingleUser(touristId || '');
+  const { data: currentUserData } = useGetSingleUser(touristId || "");
 
   const {
     mutate: handleUpdateUserApi,
@@ -104,7 +96,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   } = useUpdateUser(profileId);
 
   useEffect(() => {
-    const accessToken = Cookies.get('accessToken');
+    const accessToken = Cookies.get("accessToken");
 
     if (accessToken) {
       const touristUser = jwtDecode<IUser>(accessToken);
@@ -119,7 +111,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     if (currentUserData) {
       const currentUser = currentUserData.data;
 
-      console.log('Current user => ', currentUser);
+      console.log("Current user => ", currentUser);
 
       if (currentUser) {
         setVisitorUser(currentUser);
@@ -151,13 +143,13 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   useEffect(() => {
     if (data) {
       setUser(data.data);
-      console.log('Data from Profile => ', data.data);
+      console.log("Data from Profile => ", data.data);
     }
   }, [data]);
 
   const handleUpdateUser = (updatedData: any) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
-    console.log('Updated Data => ', updatedData);
+    console.log("Updated Data => ", updatedData);
     handleUpdateUserApi(updatedData, {
       onSuccess: () => {
         // Re-fetch user data after successful update
@@ -168,7 +160,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
   const handleUpdatePremiumUser = async (updatedData: any) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
-    console.log('Updated Data => ', updatedData);
+    console.log("Updated Data => ", updatedData);
     handleUpdateUserApi(updatedData, {
       onSuccess: () => {
         // Re-fetch user data after successful update
@@ -183,7 +175,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
     const paymentUrl = response.data?.paymentSession?.payment_url;
 
-    console.log('Payment res: ', response.data.paymentSession.payment_url);
+    console.log("Payment res: ", response.data.paymentSession.payment_url);
 
     if (paymentUrl) {
       // Redirect user to the payment URL in the current tab
@@ -194,14 +186,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   // Display notifications and handle loading state
   useEffect(() => {
     if (updatePending) {
-      toast('Updating user information, please wait...', {
+      toast("Updating user information, please wait...", {
         duration: Infinity,
       });
     }
 
     if (updateSuccess) {
       toast.dismiss(); // Dismiss loading notification
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
     }
   }, [updatePending, updateSuccess]);
 
@@ -219,7 +211,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const handleReport = (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to report "${name}"?`)) {
       reportUserMutation.mutate(id);
-      console.log('Reported id = ', id);
+      console.log("Reported id = ", id);
     }
   };
 
@@ -239,9 +231,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   // Static cover picture fallback
   const coverPicture =
     user.coverPicture ||
-    'https://www.bayarea.com/wp-content/uploads/2017/07/CookingClass_main.jpg'; // Fallback cover image
+    "https://www.bayarea.com/wp-content/uploads/2017/07/CookingClass_main.jpg"; // Fallback cover image
 
-  console.log('User => ', user);
+  console.log("User => ", user);
 
   return (
     <div className="w-full mt-0">
@@ -309,7 +301,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     }, 500);
                   }}
                 >
-                  {followLoading ? 'Unfollowing...' : 'Unfollow'}
+                  {followLoading ? "Unfollowing..." : "Unfollow"}
                 </Button>
               ) : (
                 <Button
@@ -324,7 +316,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     }, 500);
                   }}
                 >
-                  {followLoading ? 'Following...' : 'Follow'}
+                  {followLoading ? "Following..." : "Follow"}
                 </Button>
               )}
             </div>
@@ -347,12 +339,12 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
         <div className="mx-1 pt-1 pb-2 border-b-1">
           <div className="flex flex-row">
-            <h1 className="text-2xl font-semibold">{user.name}</h1>{' '}
+            <h1 className="text-2xl font-semibold">{user.name}</h1>{" "}
             {user.isPremium && <PiSealCheckFill />}
-            {user.role === 'ADMIN' && <MdOutlineAdminPanelSettings />}
+            {user.role === "ADMIN" && <MdOutlineAdminPanelSettings />}
             {isOwner && (
               <>
-                {!user.isPremium && user.role === 'USER' && (
+                {!user.isPremium && user.role === "USER" && (
                   <Button
                     className="ml-2 bg-transparent border-1 border-double border-gray-500 text-gray-500"
                     radius="full"
@@ -368,7 +360,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     }}
                   >
                     {premiumPayPending ? (
-                      'Processing...'
+                      "Processing..."
                     ) : (
                       <span className="flex flex-row">
                         Get Premiums&nbsp;
@@ -390,12 +382,12 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   &nbsp;{user.city}
                 </p>
                 <p>
-                  {user.foodHabit === 'vegan' ? (
+                  {user.foodHabit === "vegan" ? (
                     <span className="flex flex-row items-center text-green-500">
                       <LuVegan />
                       &nbsp;Vegan
                     </span>
-                  ) : user.foodHabit === 'veg' ? (
+                  ) : user.foodHabit === "veg" ? (
                     <span className="flex flex-row items-center text-lime-500">
                       <LuVegan />
                       &nbsp;Vegan
@@ -409,11 +401,11 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                 </p>
               </div>
               <p className="text-blue-500">
-                {user.topics?.map((topic) => `#${topic}`).join(' ')}
+                {user.topics?.map((topic) => `#${topic}`).join(" ")}
               </p>
             </div>
           </div>
-          {user.role === 'USER' && (
+          {user.role === "USER" && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 mt-2">
               <Link href={`/profile/${profileId}/followers`}>
                 <span className="text-gray-500 font-medium hover:underline">

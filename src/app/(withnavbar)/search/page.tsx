@@ -53,7 +53,7 @@ const SearchPage = () => {
     .filter((user: IUser) => (selectedCity ? user.city === selectedCity : true))
     .filter((user: IUser) =>
       selectedUserDiets.length > 0
-        ? selectedUserDiets.includes(user.foodHabit)
+        ? selectedUserDiets.includes(user!.foodHabit!)
         : true,
     );
 

@@ -81,11 +81,15 @@ const RecipeFeed: React.FC<RecipeFeedProps> = ({ userId, limit = 5 }) => {
   ];
 
   return (
-    <div className="recipe-feed-container w-auto" ref={containerRef}>
-      {allDisplayedRecipes.map((recipe: any, index: number) => (
-        <RecipeCard key={`${recipe._id}-${index}`} recipe={recipe} />
-      ))}
-
+    <div
+      className="flex flex-col items-center justify-center w-full"
+      ref={containerRef}
+    >
+      <div className="flex flex-col items-center justify-center w-11/12">
+        {allDisplayedRecipes.map((recipe: any, index: number) => (
+          <RecipeCard key={`${recipe._id}-${index}`} recipe={recipe} />
+        ))}
+      </div>
       <div ref={ref} className="w-full">
         <LoadingRecipeCard />
         {isFetchingNextPage || isLoadingRepeatedData ? (

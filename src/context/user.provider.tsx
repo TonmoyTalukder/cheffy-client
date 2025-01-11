@@ -25,14 +25,19 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleUser = async () => {
-    const user = (await getCurrentUser()) as IUser;
+    const currentUser = (await getCurrentUser()) as IUser | null;
 
-    setUser(user);
-    setIsLoading(false);
+    // If the user is not null, set the user state and mark loading as complete
+    if (currentUser) {
+      setUser(currentUser);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    handleUser();
+    if (isLoading) {
+      handleUser();
+    }
   }, [isLoading]);
 
   return (
@@ -45,11 +50,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
 export const useUser = () => {
   const context = useContext(UserContext);
 
-  if (context === undefined) {
-    throw new Error("useUser must be used within the UserProvider context");
-  }
-
-  if (context === null) {
+  if (context === undefined || context === null) {
     throw new Error("useUser must be used within the UserProvider context");
   }
 

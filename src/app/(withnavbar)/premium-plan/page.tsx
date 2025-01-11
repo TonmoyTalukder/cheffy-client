@@ -1,17 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import {
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
   useDisclosure,
-  Card,
-} from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
+} from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 const PremiumPlanPage = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -46,7 +44,7 @@ const PremiumPlanPage = () => {
                   <div className="flex flex-col gap-4 w-fit">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full">
-                        <i className="fas fa-star"></i>
+                        <i className="fas fa-star" />
                       </div>
                       <p className="text-lg text-gray-700 font-medium">
                         Post Premium Recipes
@@ -54,7 +52,7 @@ const PremiumPlanPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">
-                        <i className="fas fa-book-open"></i>
+                        <i className="fas fa-book-open" />
                       </div>
                       <p className="text-lg text-gray-700 font-medium">
                         Read Premium Recipes
@@ -62,7 +60,7 @@ const PremiumPlanPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 flex items-center justify-center bg-yellow-500 text-white rounded-full">
-                        <i className="fas fa-crown"></i>
+                        <i className="fas fa-crown" />
                       </div>
                       <p className="text-lg text-gray-700 font-medium">
                         Access Exclusive Content

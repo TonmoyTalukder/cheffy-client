@@ -25,7 +25,7 @@ const FollowingRecipeFeed: React.FC<RecipeFeedProps> = ({
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [repeatedData, setRepeatedData] = useState<any[]>([]);
-  const [isRepeating, setIsRepeating] = useState(false); // Added state to track repeating
+  const [isRepeating, setIsRepeating] = useState(false);
   const [isLoadingRepeatedData, setIsLoadingRepeatedData] = useState(false);
 
   const { ref, inView } = useInView({
@@ -87,10 +87,18 @@ const FollowingRecipeFeed: React.FC<RecipeFeedProps> = ({
     ...(data?.pages?.flatMap((page) => page.recipes) || []),
     ...repeatedData,
   ];
+  const followingIds = user?.following?.map((follow) => follow.id) || [];
+  const filteredRecipes = allDisplayedRecipes.filter((recipe) =>
+    followingIds.includes(recipe.authId?._id),
+  );
+
+  const fallbackRecipes = filteredRecipes.length
+    ? filteredRecipes
+    : allDisplayedRecipes.filter((recipe) => recipe.diet === user?.foodHabit);
 
   return (
     <div className="recipe-feed-container w-auto" ref={containerRef}>
-      {allDisplayedRecipes.map((recipe: any, index: number) => (
+      {fallbackRecipes.map((recipe: any, index: number) => (
         <RecipeCard key={`${recipe._id}-${index}`} recipe={recipe} />
       ))}
 

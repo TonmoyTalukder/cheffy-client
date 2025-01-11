@@ -1,4 +1,4 @@
-import BackRouter from '@/src/components/UI/BackRouter';
+import BackRouter from "@/src/components/UI/BackRouter";
 
 export default function ProfileLayout({
   children,

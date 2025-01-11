@@ -37,7 +37,7 @@ const WhomToFollow = () => {
         })
         .sort((a: any, b: any) => b.rank - a.rank);
 
-      setFilteredUsers(rankedUsers.slice(0, 5));
+      setFilteredUsers(rankedUsers.slice(0, 3));
     }
   }, [usersData, user]);
 
@@ -46,7 +46,7 @@ const WhomToFollow = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 rounded-lg">
+    <div className="p-6 bg-gray-100 rounded-lg w-full">
       <h2 className="text-xl font-bold text-center mb-4">Who to Follow</h2>
       <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
         {filteredUsers.map((u: IUser) => (

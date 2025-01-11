@@ -58,7 +58,8 @@ const AdminUser = () => {
       if (showReportedOnly) {
         // Show only reported users and apply report filter
         const withinReportRange =
-          user.report >= reportFilter[0] && user.report <= reportFilter[1];
+          Number(user.report) >= reportFilter[0] &&
+          Number(user.report) <= reportFilter[1];
 
         return withinReportRange && matchesSearchTerm;
       }

@@ -4,7 +4,6 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Menu, MenuItem, Button } from "@nextui-org/react";
 import { CgClose } from "react-icons/cg";
-import { AiOutlineLogout } from "react-icons/ai";
 
 import { useUser } from "@/src/context/user.provider";
 import { useGetSingleUser } from "@/src/hooks/user.hooks";
@@ -68,8 +67,8 @@ const Sidebar = ({
         <MenuItem onClick={() => navigateTo(`/profile/${loggedUser._id}`)}>
           Profile
         </MenuItem>
-        <MenuItem onClick={() => handleLogout()}>
-          <AiOutlineLogout size={25} />
+        <MenuItem onClick={() => handleLogout()} className="text-red-600">
+          Logout
         </MenuItem>
       </Menu>
     </div>

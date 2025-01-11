@@ -181,7 +181,13 @@ const UpdateRecipeForm = ({ recipe, recipeId }: UpdateRecipeFormProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-8 rounded-lg shadow-lg border border-gray-200">
+    <div
+      className="max-w-5xl mx-auto max-h-[70vh] mt-10 p-8 rounded-lg shadow-lg border border-gray-200 overflow-y-auto"
+      style={{
+        scrollbarWidth: "thin", // Firefox support
+        scrollbarColor: "transparent transparent", // Transparent scrollbar for Firefox
+      }}
+    >
       {/* Recipe Title */}
       <div className="mb-6">
         <Input

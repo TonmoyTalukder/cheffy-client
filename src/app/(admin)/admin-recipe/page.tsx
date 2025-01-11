@@ -49,8 +49,8 @@ const AdminRecipe = () => {
     if (showReportedOnly) {
       // Only include recipes within the report range
       return (
-        recipe.report >= reportFilter[0] &&
-        recipe.report <= reportFilter[1] &&
+        Number(recipe.report) >= reportFilter[0] &&
+        Number(recipe.report) <= reportFilter[1] &&
         matchesSearch
       );
     } else {

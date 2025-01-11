@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Button,
@@ -12,35 +12,34 @@ import {
   ModalHeader,
   Spinner,
   useDisclosure,
-} from '@nextui-org/react';
-import Image from 'next/image';
-import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
-import { toast } from 'sonner';
-import { PiSealCheckFill } from 'react-icons/pi';
-import Link from 'next/link';
-import axios from 'axios';
-import { FaEdit } from 'react-icons/fa';
+} from "@nextui-org/react";
+import Image from "next/image";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
+import { PiSealCheckFill } from "react-icons/pi";
+import Link from "next/link";
+import axios from "axios";
+import { FaEdit } from "react-icons/fa";
 import {
   MdOutlineAdminPanelSettings,
   MdOutlineReportProblem,
-} from 'react-icons/md';
-import { useRouter } from 'next/navigation';
+} from "react-icons/md";
+import { useRouter } from "next/navigation";
 
-import { IUser, TFollowUser } from '@/src/types';
+import { IUser, TFollowUser } from "@/src/types";
 import {
   useFollowUser,
   useGetSingleUser,
   usePremiumPayment,
   useReportUser,
   useUpdateUser,
-} from '@/src/hooks/user.hooks';
-import EditProfileModal from '@/src/components/modal/EditProfileModal';
-import envConfig from '@/src/config/envConfig';
-import RecipePostForm from '@/src/components/post/RecipePostForm';
-import UserRecipePost from '@/src/components/post/UserRecipePost';
-import About from '@/src/components/profile/About';
-import WritePost from '@/src/components/feed/WritePost';
+} from "@/src/hooks/user.hooks";
+import EditProfileModal from "@/src/components/modal/EditProfileModal";
+import envConfig from "@/src/config/envConfig";
+import UserRecipePost from "@/src/components/post/UserRecipePost";
+import About from "@/src/components/profile/About";
+import WritePost from "@/src/components/feed/WritePost";
 
 interface IProps {
   params: {
@@ -64,9 +63,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !sessionStorage.getItem('reloaded')) {
+    if (typeof window !== "undefined" && !sessionStorage.getItem("reloaded")) {
       // Reload the page and set a flag to avoid infinite loop
-      sessionStorage.setItem('reloaded', 'true');
+      sessionStorage.setItem("reloaded", "true");
       window.location.reload();
     }
   }, []);
@@ -77,18 +76,18 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const [isOwner, setIsOwner] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followsYou, setFollowsYou] = useState(false);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState("posts");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (user && user.role === 'ADMIN') {
-      setActiveTab('about');
+    if (user && user.role === "ADMIN") {
+      setActiveTab("about");
     }
   }, [user]);
 
   // Fetch data for the current visitor
   const [touristId, setTouristId] = useState<string | null>(null);
-  const { data: currentUserData } = useGetSingleUser(touristId || '');
+  const { data: currentUserData } = useGetSingleUser(touristId || "");
 
   const {
     mutate: handleUpdateUserApi,
@@ -97,7 +96,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   } = useUpdateUser(profileId);
 
   useEffect(() => {
-    const accessToken = Cookies.get('accessToken');
+    const accessToken = Cookies.get("accessToken");
 
     if (accessToken) {
       const touristUser = jwtDecode<IUser>(accessToken);
@@ -112,7 +111,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
     if (currentUserData) {
       const currentUser = currentUserData.data;
 
-      console.log('Current user => ', currentUser);
+      console.log("Current user => ", currentUser);
 
       if (currentUser) {
         setVisitorUser(currentUser);
@@ -144,13 +143,13 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   useEffect(() => {
     if (data) {
       setUser(data.data);
-      console.log('Data from Profile => ', data.data);
+      console.log("Data from Profile => ", data.data);
     }
   }, [data]);
 
   const handleUpdateUser = (updatedData: any) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
-    console.log('Updated Data => ', updatedData);
+    console.log("Updated Data => ", updatedData);
     handleUpdateUserApi(updatedData, {
       onSuccess: () => {
         // Re-fetch user data after successful update
@@ -161,7 +160,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
   const handleUpdatePremiumUser = async (updatedData: any) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
-    console.log('Updated Data => ', updatedData);
+    console.log("Updated Data => ", updatedData);
     handleUpdateUserApi(updatedData, {
       onSuccess: () => {
         // Re-fetch user data after successful update
@@ -176,7 +175,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
     const paymentUrl = response.data?.paymentSession?.payment_url;
 
-    console.log('Payment res: ', response.data.paymentSession.payment_url);
+    console.log("Payment res: ", response.data.paymentSession.payment_url);
 
     if (paymentUrl) {
       // Redirect user to the payment URL in the current tab
@@ -187,14 +186,14 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   // Display notifications and handle loading state
   useEffect(() => {
     if (updatePending) {
-      toast('Updating user information, please wait...', {
+      toast("Updating user information, please wait...", {
         duration: Infinity,
       });
     }
 
     if (updateSuccess) {
       toast.dismiss(); // Dismiss loading notification
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
     }
   }, [updatePending, updateSuccess]);
 
@@ -212,7 +211,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   const handleReport = (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to report "${name}"?`)) {
       reportUserMutation.mutate(id);
-      console.log('Reported id = ', id);
+      console.log("Reported id = ", id);
     }
   };
 
@@ -232,9 +231,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
   // Static cover picture fallback
   const coverPicture =
     user.coverPicture ||
-    'https://www.bayarea.com/wp-content/uploads/2017/07/CookingClass_main.jpg'; // Fallback cover image
+    "https://www.bayarea.com/wp-content/uploads/2017/07/CookingClass_main.jpg"; // Fallback cover image
 
-  console.log('User => ', user);
+  console.log("User => ", user);
 
   return (
     <div className="w-full mt-0">
@@ -262,12 +261,12 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             />
             <div className="ml-4 mt-2">
               <div className="flex flex-row">
-                <h1 className="text-3xl font-semibold">{user.name}</h1>{' '}
+                <h1 className="text-3xl font-semibold">{user.name}</h1>{" "}
                 {user.isPremium && <PiSealCheckFill />}
-                {user.role === 'ADMIN' && <MdOutlineAdminPanelSettings />}
+                {user.role === "ADMIN" && <MdOutlineAdminPanelSettings />}
                 {isOwner && (
                   <>
-                    {!user.isPremium && user.role === 'USER' && (
+                    {!user.isPremium && user.role === "USER" && (
                       <Button
                         className="ml-2"
                         size="md"
@@ -282,7 +281,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                         }}
                       >
                         {premiumPayPending ? (
-                          'Processing...'
+                          "Processing..."
                         ) : (
                           <p className="flex">
                             Be Premium User &nbsp; <PiSealCheckFill />
@@ -293,7 +292,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   </>
                 )}
               </div>
-              {user.role === 'USER' && (
+              {user.role === "USER" && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 mt-2">
                   <span className="text-gray-500 font-medium">
                     {user.followers!.length} Followers
@@ -329,7 +328,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                       <MdOutlineReportProblem
                         className="text-red-500"
                         size={18}
-                      />{' '}
+                      />{" "}
                       Report
                     </span>
                   )}
@@ -352,7 +351,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     }, 500);
                   }}
                 >
-                  {followLoading ? 'Unfollowing...' : 'Unfollow'}
+                  {followLoading ? "Unfollowing..." : "Unfollow"}
                 </Button>
               ) : (
                 <Button
@@ -366,7 +365,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     }, 500);
                   }}
                 >
-                  {followLoading ? 'Following...' : 'Follow'}
+                  {followLoading ? "Following..." : "Follow"}
                 </Button>
               )}
             </div>
@@ -392,17 +391,17 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             <strong>City:</strong> {user.city}
           </p>
           <p>
-            <strong>Food Habit:</strong>{' '}
-            {user.foodHabit === 'vegan' ? (
+            <strong>Food Habit:</strong>{" "}
+            {user.foodHabit === "vegan" ? (
               <span>Vegan</span>
-            ) : user.foodHabit === 'veg' ? (
+            ) : user.foodHabit === "veg" ? (
               <span>Vegan</span>
             ) : (
               <span>Non Veg</span>
             )}
           </p>
           <p>
-            <strong>Topics:</strong> {user.topics?.join(', ')}
+            <strong>Topics:</strong> {user.topics?.join(", ")}
           </p>
         </div>
       </div>
@@ -417,37 +416,37 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
 
       {/* Tab Menu */}
       <div className="p-3">
-        {user.role === 'USER' ? (
+        {user.role === "USER" ? (
           <div className="flex justify-around space-x-4 text-lg font-semibold overflow-x-auto">
             <button
               className={`px-4 py-2 ${
-                activeTab === 'about' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "about" ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={() => setActiveTab('about')}
+              onClick={() => setActiveTab("about")}
             >
               About
             </button>
             <button
               className={`px-4 py-2 ${
-                activeTab === 'posts' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "posts" ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={() => setActiveTab('posts')}
+              onClick={() => setActiveTab("posts")}
             >
               Posts
             </button>
             <button
               className={`px-4 py-2 ${
-                activeTab === 'followers' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "followers" ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={() => setActiveTab('followers')}
+              onClick={() => setActiveTab("followers")}
             >
               Followers
             </button>
             <button
               className={`px-4 py-2 ${
-                activeTab === 'following' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "following" ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={() => setActiveTab('following')}
+              onClick={() => setActiveTab("following")}
             >
               Following
             </button>
@@ -456,15 +455,15 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
           <div className="flex justify-around space-x-4 text-lg font-semibold overflow-x-auto">
             <button
               className={`px-4 py-2 ${
-                activeTab === 'about' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "about" ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={() => setActiveTab('about')}
+              onClick={() => setActiveTab("about")}
             >
               About
             </button>
             <button
               className={`px-4 py-2 ${
-                activeTab === 'posts' ? 'border-b-4 border-blue-500' : ''
+                activeTab === "posts" ? "border-b-4 border-blue-500" : ""
               }`}
               onClick={() => navigateTo(`/admin-dashboard`)}
             >
@@ -477,7 +476,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
       <div>
         {/* Right Column for Posts and others */}
         <div>
-          {activeTab === 'posts' && (
+          {activeTab === "posts" && (
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Intro Section */}
               <div className="hidden lg:block xl:block p-6 rounded-lg shadow-lg w-1/3  max-h-fit">
@@ -488,17 +487,17 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     <strong>City:</strong> {user.city}
                   </p>
                   <p>
-                    <strong>Food Habit:</strong>{' '}
-                    {user.foodHabit === 'vegan' ? (
+                    <strong>Food Habit:</strong>{" "}
+                    {user.foodHabit === "vegan" ? (
                       <span>Vegan</span>
-                    ) : user.foodHabit === 'veg' ? (
+                    ) : user.foodHabit === "veg" ? (
                       <span>Vegan</span>
                     ) : (
                       <span>Non Veg</span>
                     )}
                   </p>
                   <p>
-                    <strong>Topics:</strong> {user.topics?.join(', ')}
+                    <strong>Topics:</strong> {user.topics?.join(", ")}
                   </p>
                 </div>
               </div>
@@ -509,7 +508,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                   {isOwner && (
                     <Button
                       className="flex items-center w-[70%] px-4 py-2 mt-5 border border-gray-500 rounded-md shadow-sm text-gray-500 hover:text-gray-200 hover:bg-gray-500 text-left"
-                      style={{ textAlign: 'left' }}
+                      style={{ textAlign: "left" }}
                       onPress={onOpen}
                     >
                       <FaEdit className="mr-2 text-gray-400" />
@@ -517,9 +516,9 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                     </Button>
                   )}
                   <Modal
-                    backdrop={'blur'}
+                    backdrop={"blur"}
                     isOpen={isOpen}
-                    scrollBehavior={'outside'}
+                    scrollBehavior={"outside"}
                     onOpenChange={onOpenChange}
                   >
                     <ModalContent>
@@ -554,7 +553,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             </div>
           )}
 
-          {activeTab === 'followers' && (
+          {activeTab === "followers" && (
             <div className="p-6 rounded-lg shadow-lg">
               {user.followers?.length === 0 ? (
                 <p className="text-gray-500 mt-2">No followers yet.</p>
@@ -594,7 +593,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             }, 500);
                           }}
                         >
-                          {followLoading ? 'Following...' : 'Follow'}
+                          {followLoading ? "Following..." : "Follow"}
                         </Button>
                       </div>
                     </div>
@@ -604,7 +603,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             </div>
           )}
 
-          {activeTab === 'following' && (
+          {activeTab === "following" && (
             <div className="p-6 rounded-lg shadow-lg">
               {user.following?.length === 0 ? (
                 <p className="text-gray-500 mt-2">Not following anyone yet.</p>
@@ -643,7 +642,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
                             }, 500);
                           }}
                         >
-                          {followLoading ? 'Unfollowing...' : 'Unfollow'}
+                          {followLoading ? "Unfollowing..." : "Unfollow"}
                         </Button>
                       </div>
                     </div>
@@ -653,7 +652,7 @@ const ProfileDetailPage = ({ params: { profileId } }: IProps) => {
             </div>
           )}
 
-          {activeTab === 'about' && (
+          {activeTab === "about" && (
             <div className="p-6 rounded-lg shadow-lg">
               {/* <h3 className="text-xl font-semibold">Details</h3> */}
               <About profileId={profileId} />

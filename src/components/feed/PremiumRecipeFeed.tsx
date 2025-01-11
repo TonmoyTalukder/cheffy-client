@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import React, { useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
-import { useFetchFeedRecipes } from '@/src/hooks/post.hooks';
+import { useFetchFeedRecipes } from "@/src/hooks/post.hooks";
 
-import { RecipeInterface } from '../post/UserRecipePost';
+import { RecipeInterface } from "../post/UserRecipePost";
 
-import RecipeCard from './RecipeCard';
-import LoadingRecipeCard from './LoadingRecipeCard';
+import RecipeCard from "./RecipeCard";
+import LoadingRecipeCard from "./LoadingRecipeCard";
 
 interface RecipeFeedProps {
   userId: string;
@@ -68,15 +68,15 @@ const PremiumRecipeFeed: React.FC<RecipeFeedProps> = ({
     }
   }, [inView, isRepeating, isLoadingRepeatedData, data]);
 
-  if (status === 'pending') {
+  if (status === "pending") {
     return (
-      <div className="recipe-feed-container xl:w-5/12 lg:w-5/12 md:w-7/12 sm:w-auto">
+      <div className="recipe-feed-container w-full">
         <LoadingRecipeCard />
       </div>
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return <p>Failed to load recipes.</p>;
   }
 
