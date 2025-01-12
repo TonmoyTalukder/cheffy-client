@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Card, Avatar, Tooltip, CardBody, Button } from "@nextui-org/react";
+import { useEffect, useState } from 'react';
+import { Card, Avatar, Tooltip, CardBody, Button } from '@nextui-org/react';
 
-import { useFollowUser, useGetAllUsers } from "@/src/hooks/user.hooks";
-import { useUser } from "@/src/context/user.provider";
-import { IUser } from "@/src/types";
+import { useFollowUser, useGetAllUsers } from '@/src/hooks/user.hooks';
+import { useUser } from '@/src/context/user.provider';
+import { IUser } from '@/src/types';
+import Link from 'next/link';
 
 const WhomToFollow = () => {
   const { data: usersFetchedData } = useGetAllUsers();
@@ -56,38 +57,42 @@ const WhomToFollow = () => {
             isPressable
             className="bg-white shadow-md rounded-lg"
           >
-            <CardBody className="flex flex-row items-start justify-start gap-0">
-              <div>
-                <Avatar
-                  src={u.displayPicture}
-                  size="sm"
-                  className="mr-4 rounded-full"
-                  isBordered
-                />
-              </div>
-              <div className="flex flex-row items-start justify-between w-full">
+            <Link className="w-full" href={`/profile/${u._id}`}>
+              <CardBody className="flex flex-row items-start justify-start gap-0 w-full">
                 <div>
-                  <h3 className="text-lg font-medium">{u.name}</h3>
-                  <p className="text-sm text-gray-500">{u.city}</p>
-                  <p className="text-sm text-gray-400">
-                    Food Habit: {u.foodHabit}
-                  </p>
+                  <Avatar
+                    src={u.displayPicture}
+                    size="sm"
+                    className="mr-4 rounded-full"
+                    isBordered
+                  />
                 </div>
-                <Tooltip content={`Follow ${u.name}`}>
-                  {/* <button className="text-blue-500 font-bold bg-transparent">
+                <div className="flex flex-row items-start justify-between w-full">
+                  <div>
+                    <h3 className="text-lg font-medium">{u.name}</h3>
+                    <p className="text-sm text-gray-500">{u.city}</p>
+                    <p className="text-sm text-gray-400">
+                      Food Habit: {u.foodHabit}
+                    </p>
+                  </div>
+                  <Tooltip content={`Follow ${u.name}`}>
+                    {/* <button className="text-blue-500 font-bold bg-transparent">
                     Follow
                   </button> */}
-                  <Button
-                    className="text-blue-500 font-bold bg-transparent"
-                    disabled={followLoading}
-                    size="md"
-                    onClick={() => user?._id && handleFollowUnfollow(user._id)}
-                  >
-                    {followLoading ? "Following..." : "Follow"}
-                  </Button>
-                </Tooltip>
-              </div>
-            </CardBody>
+                    <Button
+                      className="text-blue-500 font-bold bg-transparent"
+                      disabled={followLoading}
+                      size="md"
+                      onClick={() =>
+                        user?._id && handleFollowUnfollow(user._id)
+                      }
+                    >
+                      {followLoading ? 'Following...' : 'Follow'}
+                    </Button>
+                  </Tooltip>
+                </div>
+              </CardBody>
+            </Link>
           </Card>
         ))}
       </div>

@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useRouter } from "next/navigation";
-import { Menu, MenuItem, Button } from "@nextui-org/react";
-import { CgClose } from "react-icons/cg";
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { Menu, MenuItem, Button } from '@nextui-org/react';
+import { CgClose } from 'react-icons/cg';
 
-import { useUser } from "@/src/context/user.provider";
-import { useGetSingleUser } from "@/src/hooks/user.hooks";
-import { logout } from "@/src/services/AuthService";
+import { useUser } from '@/src/context/user.provider';
+import { useGetSingleUser } from '@/src/hooks/user.hooks';
+import { logout } from '@/src/services/AuthService';
+import Loading from '../loading';
 
 const Sidebar = ({
   toggleDrawer,
@@ -20,6 +21,8 @@ const Sidebar = ({
   const { user: searchingUser, setIsLoading: userLoading } = useUser();
   const { data: loggedUserData } = useGetSingleUser(searchingUser?._id!);
   const loggedUser = loggedUserData?.data;
+
+  console.log('Looged User: ', loggedUser);
 
   const navigateTo = (path: string) => {
     router.push(path);
@@ -36,14 +39,22 @@ const Sidebar = ({
       // Set loading state to true while logging out
       userLoading(true);
 
-      router.replace("/login");
+      router.replace('/login');
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error('Error logging out:', error);
     } finally {
       // Stop the loading state once logout is complete
       userLoading(false);
     }
   };
+
+  if (loggedUser === undefined || null) {
+    return (
+      <div className="w-[100vw] z-10">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full p-4 bg-gray-800 text-white">
@@ -59,11 +70,11 @@ const Sidebar = ({
         </Button>
       )}
       <Menu className="flex flex-col mt-8">
-        <MenuItem onClick={() => navigateTo("/admin-dashboard")}>
+        <MenuItem onClick={() => navigateTo('/admin-dashboard')}>
           Dashboard
         </MenuItem>
-        <MenuItem onClick={() => navigateTo("/admin-user")}>User</MenuItem>
-        <MenuItem onClick={() => navigateTo("/admin-recipe")}>Recipe</MenuItem>
+        <MenuItem onClick={() => navigateTo('/admin-user')}>User</MenuItem>
+        <MenuItem onClick={() => navigateTo('/admin-recipe')}>Recipe</MenuItem>
         <MenuItem onClick={() => navigateTo(`/profile/${loggedUser._id}`)}>
           Profile
         </MenuItem>

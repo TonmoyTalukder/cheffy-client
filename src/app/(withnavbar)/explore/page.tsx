@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -15,21 +15,24 @@ import {
   useDisclosure,
   Checkbox,
   CheckboxGroup,
-} from "@nextui-org/react";
-import { MdSearch } from "react-icons/md";
-import { AiOutlineSetting } from "react-icons/ai";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+} from '@nextui-org/react';
+import { MdSearch } from 'react-icons/md';
+import { AiOutlineSetting } from 'react-icons/ai';
+import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
-import { useGetAllUsers } from "@/src/hooks/user.hooks";
-import { IRecipeResponse, IUser } from "@/src/types";
-import { useFetchRecipes } from "@/src/hooks/post.hooks";
-import RecipeCard from "@/src/components/feed/RecipeCard";
+import { useGetAllUsers } from '@/src/hooks/user.hooks';
+import { IRecipeResponse, IUser } from '@/src/types';
+import { useFetchRecipes } from '@/src/hooks/post.hooks';
+import RecipeCard from '@/src/components/feed/RecipeCard';
 
-const MAX_DISPLAY_ITEMS = 3;
+const MAX_DISPLAY_ITEMS = 4;
 
 const SearchPage = () => {
+  const searchParams = useSearchParams();
+  const querySearchText = searchParams.get('searchText');
+
   const router = useRouter();
   const { data: usersFetchedData } = useGetAllUsers();
   const usersData = usersFetchedData?.data || [];
@@ -38,11 +41,11 @@ const SearchPage = () => {
 
   const [showUsers, setShowUsers] = useState(true);
   const [showRecipes, setShowRecipes] = useState(true);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState<string>(querySearchText || '');
   const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
   const [selectedUserDiets, setSelectedUserDiets] = useState<string[]>([]);
-  const [selectedCookingTime, setSelectedCookingTime] = useState<number | "">(
-    "",
+  const [selectedCookingTime, setSelectedCookingTime] = useState<number | ''>(
+    '',
   );
   const [selectedRecipeDiets, setSelectedRecipeDiets] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -70,32 +73,65 @@ const SearchPage = () => {
   };
 
   useEffect(() => {
+    if (querySearchText) {
+      setSearchText(querySearchText as string);
+    }
+  }, [querySearchText]);
+
+  useEffect(() => {
     if (searchText) {
-      const filteredUsers = usersData.filter(
-        (user: IUser) =>
-          user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchText.toLowerCase()),
-      );
+      const filteredUsers = usersData
+        .filter(
+          (user: IUser) =>
+            user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchText.toLowerCase()),
+        )
+        .filter((user: IUser) =>
+          selectedUserDiets.length > 0
+            ? selectedUserDiets.includes(user!.foodHabit!)
+            : true,
+        );
 
       setFilteredUsers(filteredUsers.slice(0, MAX_DISPLAY_ITEMS));
 
-      const filteredRecipes = recipes.filter(
-        (recipe: IRecipeResponse) =>
-          recipe.title.toLowerCase().includes(searchText.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchText.toLowerCase()),
-      );
-
+      const filteredRecipes = recipes
+        .filter(
+          (recipe: IRecipeResponse) =>
+            recipe.authorId.name
+              .toLowerCase()
+              .includes(searchText.toLowerCase()) ||
+            recipe.title.toLowerCase().includes(searchText.toLowerCase()) ||
+            recipe.ingredients.some((ingredient: any) =>
+              typeof ingredient === 'string'
+                ? ingredient.toLowerCase().includes(searchText.toLowerCase())
+                : false,
+            ) ||
+            recipe.tags.some((tag: string) =>
+              tag.toLowerCase().includes(searchText.toLowerCase()),
+            ),
+        )
+        .filter((recipe: IRecipeResponse) =>
+          selectedCookingTime
+            ? recipe.cookingTime <= selectedCookingTime
+            : true,
+        )
+        .filter((recipe: IRecipeResponse) =>
+          selectedRecipeDiets.length > 0
+            ? selectedRecipeDiets.includes(recipe.diet)
+            : true,
+        );
       setFilteredRecipes(filteredRecipes.slice(0, MAX_DISPLAY_ITEMS));
     } else {
       setFilteredUsers(fetchLatestUsers(usersData));
       setFilteredRecipes(fetchLatestRecipes(recipes));
     }
-  }, [searchText, usersData, recipes]);
+  }, [searchText, filteredUsers, filteredRecipes]);
 
   useEffect(() => {
     if (selectedUserDiets.length > 0) {
-      const filteredUsers: IUser[] = usersData.filter((user: IUser) =>
-        selectedUserDiets.includes(user!.foodHabit!),
+      const filteredUsers: IUser[] = usersData.filter(
+        (user: IUser) =>
+          user.foodHabit && selectedUserDiets.includes(user.foodHabit),
       );
 
       setFilteredUsers(filteredUsers.slice(0, MAX_DISPLAY_ITEMS));
@@ -176,7 +212,7 @@ const SearchPage = () => {
             </div>
             {showUsers && (
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-                {filteredUsers.map((user) => (
+                {filteredUsers.map((user: IUser) => (
                   <Card
                     key={user._id}
                     isHoverable
@@ -204,7 +240,7 @@ const SearchPage = () => {
             )}
             {showUsers && (
               <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push("/follow")}>
+                <Button variant="flat" onClick={() => router.push('/follow')}>
                   See More
                 </Button>
               </div>
@@ -228,7 +264,7 @@ const SearchPage = () => {
             </div>
             {showRecipes && (
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-                {filteredRecipes.map((recipe) => (
+                {filteredRecipes.map((recipe: IRecipeResponse) => (
                   <RecipeCard
                     key={`${recipe._id}`}
                     recipe={{
@@ -247,7 +283,7 @@ const SearchPage = () => {
             )}
             {showRecipes && (
               <div className="text-center mt-4">
-                <Button variant="flat" onClick={() => router.push("/")}>
+                <Button variant="flat" onClick={() => router.push('/')}>
                   See More
                 </Button>
               </div>
@@ -282,7 +318,7 @@ const SearchPage = () => {
                   type="number"
                   value={selectedCookingTime.toString()}
                   onChange={(e) =>
-                    setSelectedCookingTime(Number(e.target.value) || "")
+                    setSelectedCookingTime(Number(e.target.value) || '')
                   }
                 />
                 <CheckboxGroup
@@ -302,7 +338,7 @@ const SearchPage = () => {
                 <Button
                   color="primary"
                   onPress={() => {
-                    console.log("Apply Filters:", {
+                    console.log('Apply Filters:', {
                       selectedUserDiets,
                       selectedCookingTime,
                       selectedRecipeDiets,

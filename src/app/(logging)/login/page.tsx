@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   useDisclosure,
@@ -9,31 +9,31 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from "@nextui-org/react";
-import Link from "next/link";
-import { FieldValues, SubmitHandler } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+} from '@nextui-org/react';
+import Link from 'next/link';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
-import CFInput from "@/src/components/form/CFInput";
-import CFForm from "@/src/components/form/CFForm";
-import { useUserLogin } from "@/src/hooks/auth.hooks";
-import { useUser } from "@/src/context/user.provider";
+import CFInput from '@/src/components/form/CFInput';
+import CFForm from '@/src/components/form/CFForm';
+import { useUserLogin } from '@/src/hooks/auth.hooks';
+import { useUser } from '@/src/context/user.provider';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const { setIsLoading: userLoading } = useUser();
   const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const redirect = searchParams.get("redirect");
-  const status = searchParams.get("status");
+  const redirect = searchParams.get('redirect');
+  const status = searchParams.get('status');
   const { isOpen: isBlockedModalOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    if (status === "blocked") {
+    if (status === 'blocked') {
       onOpen();
     }
   }, [status, onOpen]);
@@ -48,18 +48,18 @@ export default function LoginPage() {
       if (redirect) {
         router.push(redirect);
       } else {
-        router.push("/");
+        router.push('/');
       }
     }
   }, [isPending, isSuccess, redirect, router]);
 
   const handleTestCredentials = (role: string) => {
-    if (role === "admin") {
-      setEmail("admin@mail.com");
-      setPassword("123456");
+    if (role === 'admin') {
+      setEmail('admin@mail.com');
+      setPassword('123456');
     } else {
-      setEmail("akshay@kumar.com");
-      setPassword("123456");
+      setEmail('akshay@kumar.com');
+      setPassword('123456');
     }
   };
 
@@ -77,20 +77,23 @@ export default function LoginPage() {
         </div>
         <h3 className="my-2 text-xl font-bold">Login</h3>
         <p className="mb-4">Welcome Back! Let&lsquo;s Get Started</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button
-            className="bg-zinc-600 hover:bg-zinc-500 text-white"
-            onPress={() => handleTestCredentials("admin")}
-          >
-            Admin
-          </Button>
+        <div className="border-1 border-dashed border-black p-3 rounded-lg">
+          <p>Credentials for Testing Purpose:</p>
+          <div className="flex flex-wrap justify-center gap-2 mt-2">
+            <Button
+              className="bg-zinc-600 hover:bg-zinc-500 text-white"
+              onPress={() => handleTestCredentials('admin')}
+            >
+              Admin
+            </Button>
 
-          <Button
-            className="bg-zinc-600 hover:bg-zinc-500 text-white"
-            onPress={() => handleTestCredentials("user")}
-          >
-            User
-          </Button>
+            <Button
+              className="bg-zinc-600 hover:bg-zinc-500 text-white"
+              onPress={() => handleTestCredentials('user')}
+            >
+              User
+            </Button>
+          </div>
         </div>
         <div className="w-[75%] md:w-[55%] lg:w-[35%]">
           <CFForm onSubmit={onSubmit}>
@@ -123,7 +126,7 @@ export default function LoginPage() {
           <div className="text-center">
             <Link
               className="text-[#daa611] hover:text-[#a58a40] underline"
-              href={"/forget-password"}
+              href={'/forget-password'}
             >
               Forgot Password?
             </Link>
@@ -131,7 +134,7 @@ export default function LoginPage() {
               Don&lsquo;t have an account?&nbsp;
               <Link
                 className="text-[#daa611] hover:text-[#a58a40] underline"
-                href={"/signup"}
+                href={'/signup'}
               >
                 Sign Up
               </Link>

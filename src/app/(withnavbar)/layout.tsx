@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <div className="w-full max-w-screen-xl mx-auto">
-        <main className="mt-5 sm:mt-0">
+        <main className="mt-0 sm:mt-0 max-w-screen">
           <div className="flex flex-row">
             {/* Sidebar */}
             <div className="hidden md:block basis-1/5 md:max-w-16 lg:max-w-full">
@@ -53,9 +53,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <MobileNavbar />
             </div>
 
-            <div className="fixed top-5 right-4 md:hidden z-50">
+            {/* <div className="fixed top-5 right-4 md:hidden z-50">
               <TopMenu />
-            </div>
+            </div> */}
           </div>
         </main>
       </div>
